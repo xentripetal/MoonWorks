@@ -24,6 +24,11 @@ namespace MoonWorks.Input
 		internal int WheelRaw;
 		private int previousWheelRaw = 0;
 
+		/// <summary>Precise scroll wheel delta (float). Useful for trackpads.</summary>
+		public float WheelPrecise { get; private set; }
+		internal float WheelRawPrecise;
+		private float previousWheelRawPrecise = 0;
+
 		/// <summary>
 		/// True if any button on the keyboard is active. Useful for input remapping.
 		/// </summary>
@@ -94,6 +99,9 @@ namespace MoonWorks.Input
 
 			Wheel = WheelRaw - previousWheelRaw;
 			previousWheelRaw = WheelRaw;
+
+			WheelPrecise = WheelRawPrecise - previousWheelRawPrecise;
+			previousWheelRawPrecise = WheelRawPrecise;
 
 			foreach (var button in CodeToButton)
             {

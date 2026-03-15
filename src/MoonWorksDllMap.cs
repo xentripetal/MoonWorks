@@ -30,6 +30,9 @@ namespace MoonWorks
 		private static Dictionary<string, string> mapDictionary
 			= new Dictionary<string, string>();
 
+		private static Dictionary<string, string[]> dependsOnDictionary
+			= new Dictionary<string, string[]>();
+
 		#endregion
 
 		#region Private Static Methods
@@ -74,6 +77,21 @@ namespace MoonWorks
 			{
 				mappedName = libraryName;
 			}
+
+			// Pre-load any transitive dependencies before loading the target library
+			if (dependsOnDictionary.TryGetValue(libraryName, out string[] deps))
+			{
+				foreach (string dep in deps)
+				{
+					string depMapped;
+					if (!mapDictionary.TryGetValue(dep, out depMapped))
+					{
+						depMapped = dep;
+					}
+					NativeLibrary.Load(depMapped, assembly, dllImportSearchPath);
+				}
+			}
+
 			return NativeLibrary.Load(mappedName, assembly, dllImportSearchPath);
 		}
 
@@ -191,6 +209,17 @@ namespace MoonWorks
 				}
 
 				mapDictionary.Add(oldLib, newLib);
+
+				// Parse dependsOn attribute for transitive native lib loading
+				XmlAttribute dependsOnAttribute = node.Attributes["dependsOn"];
+				if (dependsOnAttribute != null && !string.IsNullOrWhiteSpace(dependsOnAttribute.Value))
+				{
+					string[] deps = dependsOnAttribute.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+					if (deps.Length > 0)
+					{
+						dependsOnDictionary[oldLib] = deps;
+					}
+				}
 			}
 
 			// Set the resolver callback for our native assemblies

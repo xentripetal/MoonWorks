@@ -381,6 +381,11 @@ namespace MoonWorks
 						break;
 
 					case SDL.SDL_EventType.SDL_EVENT_TEXT_INPUT:
+						// Process text input immediately — evt.text is a pointer
+						// that becomes invalid after SDL_PollEvent returns
+						HandleTextInput(evt.text);
+						break;
+
 					case SDL.SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
 					case SDL.SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN:
 					case SDL.SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP:
@@ -401,12 +406,11 @@ namespace MoonWorks
 			{
 				switch ((SDL.SDL_EventType) evt.type)
 				{
-					case SDL.SDL_EventType.SDL_EVENT_TEXT_INPUT:
-						HandleTextInput(evt.text);
-						break;
+					// TEXT_INPUT handled immediately in GatherSDLEvents (pointer lifetime)
 
 					case SDL.SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
 						Inputs.Mouse.WheelRaw += (int) evt.wheel.y;
+						Inputs.Mouse.WheelRawPrecise += evt.wheel.y;
 						break;
 
 					case SDL.SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN:
