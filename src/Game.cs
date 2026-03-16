@@ -149,6 +149,7 @@ namespace MoonWorks
 		public void Run()
 		{
 			MainWindow.Show();
+			SDL.SDL_RaiseWindow(MainWindow.Handle);
 
 			Initialized = true;
 
