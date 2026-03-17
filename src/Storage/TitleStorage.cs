@@ -44,13 +44,7 @@ public class TitleStorage : IDisposable
     /// <returns>True if the query succeeded, false otherwise.</returns>
     public bool GetFileSize(string path, out ulong size)
     {
-        if (!SDL.SDL_GetStorageFileSize(Handle, path, out size))
-        {
-            Logger.LogError($"File at {path} failed to load: {SDL.SDL_GetError()}");
-            return false;
-        }
-
-        return true;
+        return SDL.SDL_GetStorageFileSize(Handle, path, out size);
     }
 
 	/// <summary>
