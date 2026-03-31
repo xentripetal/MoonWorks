@@ -266,6 +266,12 @@ namespace MoonWorks
 		protected virtual void DropBegin() {}
 		protected virtual void DropComplete() {}
 
+		/// <summary>
+		/// Called for each SDL event before it is routed to input or system queues.
+		/// Return true to consume the event (prevent normal processing).
+		/// </summary>
+		protected virtual bool OnSDLEvent(ref SDL.SDL_Event evt) => false;
+
 		private void Tick(bool processEvents)
 		{
 			AdvanceElapsedTime();
@@ -368,6 +374,9 @@ namespace MoonWorks
 		{
 			while (SDL.SDL_PollEvent(out var evt))
 			{
+				if (OnSDLEvent(ref evt))
+					continue;
+
 				switch ((SDL.SDL_EventType) evt.type)
 				{
 					case SDL.SDL_EventType.SDL_EVENT_QUIT:
