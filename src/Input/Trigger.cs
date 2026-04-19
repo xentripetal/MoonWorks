@@ -22,7 +22,8 @@ namespace MoonWorks.Input
 			Gamepad parent,
 			TriggerCode code,
 			SDL.SDL_GamepadAxis sdlAxis
-		) {
+		)
+		{
 			Parent = parent;
 			Code = code;
 			SDL_Axis = sdlAxis;

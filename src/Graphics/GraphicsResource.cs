@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace MoonWorks.Graphics;
@@ -36,11 +36,11 @@ public abstract class GraphicsResource : IDisposable
 
 	~GraphicsResource()
 	{
-		#if DEBUG
+#if DEBUG
 		// If you see this log message, you leaked a graphics resource without disposing it!
 		// We'll try to clean it up for you but you really should fix this.
 		Logger.LogWarn($"A resource named {Name} of type {GetType().Name} was not Disposed.");
-		#endif
+#endif
 
 		Dispose(false);
 	}

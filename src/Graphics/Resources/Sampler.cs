@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SDL = MoonWorks.Graphics.SDL_GPU;
 
 namespace MoonWorks.Graphics;
@@ -13,7 +13,8 @@ public class Sampler : SDLGPUResource
 	public static Sampler Create(
 		GraphicsDevice device,
 		in SamplerCreateInfo samplerCreateInfo
-	) {
+	)
+	{
 		var handle = SDL.SDL_CreateGPUSampler(
 			device.Handle,
 			samplerCreateInfo
@@ -36,7 +37,8 @@ public class Sampler : SDLGPUResource
 		GraphicsDevice device,
 		string name,
 		SamplerCreateInfo samplerCreateInfo
-	) {
+	)
+	{
 		var cleanProps = false;
 		if (samplerCreateInfo.Props == 0)
 		{

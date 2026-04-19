@@ -1,4 +1,4 @@
-﻿namespace MoonWorks.Input
+namespace MoonWorks.Input
 {
 	/// <summary>
 	/// ScanCode refers to a physical button location on a keyboard. It is localization-independent.

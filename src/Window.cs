@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MoonWorks.Graphics;
 using SDL3;
@@ -85,7 +85,7 @@ namespace MoonWorks
 			ScreenMode = windowCreateInfo.ScreenMode;
 
 			var displayID = SDL.SDL_GetPrimaryDisplay();
-			SDL.SDL_DisplayMode *displayMode = (SDL.SDL_DisplayMode*) SDL.SDL_GetCurrentDisplayMode(displayID);
+			SDL.SDL_DisplayMode* displayMode = (SDL.SDL_DisplayMode*) SDL.SDL_GetCurrentDisplayMode(displayID);
 
 			Handle = SDL.SDL_CreateWindow(
 				windowCreateInfo.WindowTitle,

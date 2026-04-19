@@ -40,8 +40,8 @@ namespace MoonWorks.Audio
 		public FAudio.FAudioFXReverbParameters Params { get; private set; }
 
 		/// <summary>
-        /// Creating the reverb effect can fail, so we don't want weird dry output if that happens.
-        /// </summary>
+		/// Creating the reverb effect can fail, so we don't want weird dry output if that happens.
+		/// </summary>
 		internal bool Valid { get; private set; }
 
 		private void Init()

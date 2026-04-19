@@ -10,7 +10,7 @@ namespace MoonWorks.Audio
 	public class AudioBuffer : AudioResource
 	{
 		IntPtr BufferDataPtr;
-		public uint BufferDataLength { get; private set;}
+		public uint BufferDataLength { get; private set; }
 		private bool OwnsBufferData;
 
 		public Format Format { get; set; }
@@ -55,7 +55,7 @@ namespace MoonWorks.Audio
 
 			fixed (void* ptr = span)
 			{
-				NativeMemory.Copy(ptr, (void*)(BufferDataPtr + offset), (nuint)span.Length);
+				NativeMemory.Copy(ptr, (void*) (BufferDataPtr + offset), (nuint) span.Length);
 			}
 		}
 

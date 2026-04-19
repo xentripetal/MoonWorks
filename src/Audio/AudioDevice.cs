@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -127,7 +127,7 @@ namespace MoonWorks.Audio
 
 			WakeSignal = new AutoResetEvent(true);
 
-			Thread = new Thread(ThreadMain);			
+			Thread = new Thread(ThreadMain);
 			Thread.IsBackground = true;
 			Thread.Start();
 
@@ -262,7 +262,8 @@ namespace MoonWorks.Audio
 			float end,
 			float duration,
 			float delayTime
-		) {
+		)
+		{
 			lock (StateLock)
 			{
 				AudioTweenManager.CreateTween(
@@ -280,7 +281,8 @@ namespace MoonWorks.Audio
 		internal void ClearTweens(
 			Voice voice,
 			AudioTweenProperty property
-		) {
+		)
+		{
 			lock (StateLock)
 			{
 				AudioTweenManager.ClearTweens(voice, property);

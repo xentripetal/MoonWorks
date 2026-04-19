@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using MoonWorks.Storage;
 using SDL = MoonWorks.Graphics.SDL_GPU;
@@ -36,7 +36,8 @@ namespace MoonWorks.Graphics
 			string filePath,
 			string entryPoint,
 			in ShaderCreateInfo shaderCreateInfo
-		) {
+		)
+		{
 			if (!storage.GetFileSize(filePath, out var size))
 			{
 				return null;
@@ -62,7 +63,8 @@ namespace MoonWorks.Graphics
 			ReadOnlySpan<byte> span,
 			string entryPoint,
 			in ShaderCreateInfo shaderCreateInfo
-		) {
+		)
+		{
 			var entryPointBuffer = InteropUtilities.EncodeToUTF8Buffer(entryPoint);
 
 			fixed (byte* spanPtr = span)
@@ -133,7 +135,8 @@ namespace MoonWorks.Graphics
 			string entryPoint,
 			ShaderStage shaderStage,
 			bool enableDebug
-		) {
+		)
+		{
 			var entryPointBuffer = InteropUtilities.EncodeToUTF8Buffer(entryPoint);
 			var nameBuffer = InteropUtilities.EncodeToUTF8Buffer(name);
 
@@ -209,7 +212,7 @@ namespace MoonWorks.Graphics
 					Name = name ?? "Shader"
 				};
 
-				SDL3.SDL.SDL_free((nint)metadata);
+				SDL3.SDL.SDL_free((nint) metadata);
 
 				return shader;
 			}
@@ -227,7 +230,8 @@ namespace MoonWorks.Graphics
 			ShaderStage shaderStage,
 			bool enableDebug,
 			params Span<ShaderCross.HLSLDefine> defines
-		) {
+		)
+		{
 			var entryPointBuffer = InteropUtilities.EncodeToUTF8Buffer(entryPoint);
 			var includeDirBuffer = InteropUtilities.EncodeToUTF8Buffer(includeDir);
 			var nameBuffer = InteropUtilities.EncodeToUTF8Buffer(name);

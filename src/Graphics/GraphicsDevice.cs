@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MoonWorks.Video;
@@ -54,7 +54,8 @@ public class GraphicsDevice : IDisposable
 		TitleStorage rootTitleStorage,
 		ShaderFormat shaderFormats,
 		bool debugMode
-	) {
+	)
+	{
 		if (shaderFormats == 0)
 		{
 			throw new System.Exception("Need at least one shader format!");
@@ -71,22 +72,28 @@ public class GraphicsDevice : IDisposable
 
 		SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.debugmode", debugMode);
 
-		if ((shaderFormats & ShaderFormat.Private) != 0) {
+		if ((shaderFormats & ShaderFormat.Private) != 0)
+		{
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.private", true);
 		}
-		if ((shaderFormats & ShaderFormat.SPIRV) != 0) {
+		if ((shaderFormats & ShaderFormat.SPIRV) != 0)
+		{
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.spirv", true);
 		}
-		if ((shaderFormats & ShaderFormat.DXBC) != 0) {
+		if ((shaderFormats & ShaderFormat.DXBC) != 0)
+		{
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.dxbc", true);
 		}
-		if ((shaderFormats & ShaderFormat.DXIL) != 0) {
+		if ((shaderFormats & ShaderFormat.DXIL) != 0)
+		{
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.dxil", true);
 		}
-		if ((shaderFormats & ShaderFormat.MSL) != 0) {
+		if ((shaderFormats & ShaderFormat.MSL) != 0)
+		{
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.msl", true);
 		}
-		if ((shaderFormats & ShaderFormat.MetalLib) != 0) {
+		if ((shaderFormats & ShaderFormat.MetalLib) != 0)
+		{
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.metallib", true);
 		}
 
@@ -155,7 +162,8 @@ public class GraphicsDevice : IDisposable
 			FullscreenVertexShader = LoadShaderFromManifest(
 				Backend,
 				"Fullscreen.vert",
-				new ShaderCreateInfo {
+				new ShaderCreateInfo
+				{
 					Stage = ShaderStage.Vertex
 				}
 			);
@@ -300,7 +308,8 @@ public class GraphicsDevice : IDisposable
 	/// <summary>
 	/// Prepares a window so that frames can be presented to it.
 	/// </summary>
-	public bool ClaimWindow(Window window) {
+	public bool ClaimWindow(Window window)
+	{
 		if (window.Claimed)
 		{
 			Logger.LogError("Window already claimed!");
@@ -356,7 +365,8 @@ public class GraphicsDevice : IDisposable
 	public bool SupportsPresentMode(
 		Window window,
 		PresentMode presentMode
-	) {
+	)
+	{
 		if (!window.Claimed)
 		{
 			Logger.LogError("Cannot query present mode support on unclaimed window!");
@@ -377,7 +387,8 @@ public class GraphicsDevice : IDisposable
 	public bool SupportsSwapchainComposition(
 		Window window,
 		SwapchainComposition swapchainComposition
-	) {
+	)
+	{
 		if (!window.Claimed)
 		{
 			Logger.LogError("Cannot query present mode support on unclaimed window!");
@@ -398,7 +409,8 @@ public class GraphicsDevice : IDisposable
 		Window window,
 		SwapchainComposition swapchainComposition,
 		PresentMode presentMode
-	) {
+	)
+	{
 		if (!window.Claimed)
 		{
 			Logger.LogError("Cannot set present mode on unclaimed window!");
@@ -456,7 +468,8 @@ public class GraphicsDevice : IDisposable
 			return true;
 		}
 
-		if (!SDL.SDL_SetGPUAllowedFramesInFlight(Handle, allowedFramesInFlight)) {
+		if (!SDL.SDL_SetGPUAllowedFramesInFlight(Handle, allowedFramesInFlight))
+		{
 			Logger.LogError(SDL3.SDL.SDL_GetError());
 			return false;
 		}
@@ -523,7 +536,8 @@ public class GraphicsDevice : IDisposable
 	/// This must be called from the thread the command buffer was acquired on.
 	/// It is an error to call this function after a swapchain texture has been acquired.
 	/// </summary>
-	public void Cancel(CommandBuffer commandBuffer) {
+	public void Cancel(CommandBuffer commandBuffer)
+	{
 		bool result = SDL.SDL_CancelGPUCommandBuffer(commandBuffer.Handle);
 		if (!result)
 		{

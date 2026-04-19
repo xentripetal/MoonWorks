@@ -17,7 +17,8 @@ public class RenderPass
 	/// <param name="graphicsPipeline">The graphics pipeline to bind.</param>
 	public void BindGraphicsPipeline(
 		GraphicsPipeline graphicsPipeline
-	) {
+	)
+	{
 		SDL_GPU.SDL_BindGPUGraphicsPipeline(
 			Handle,
 			graphicsPipeline.Handle
@@ -53,7 +54,8 @@ public class RenderPass
 	public void BindVertexBuffers(
 		uint slot,
 		params Span<BufferBinding> bufferBindings
-	) {
+	)
+	{
 		SDL_GPU.SDL_BindGPUVertexBuffers(
 			Handle,
 			slot,
@@ -70,10 +72,12 @@ public class RenderPass
 	public void BindVertexBuffers(
 		uint slot,
 		params Span<Buffer> buffers
-	) {
+	)
+	{
 		Span<BufferBinding> bufferBindings = stackalloc BufferBinding[buffers.Length];
 
-		for (var i = 0; i < bufferBindings.Length; i += 1) {
+		for (var i = 0; i < bufferBindings.Length; i += 1)
+		{
 			bufferBindings[i].Buffer = buffers[i].Handle;
 			bufferBindings[i].Offset = 0;
 		}
@@ -102,7 +106,8 @@ public class RenderPass
 	public void BindIndexBuffer(
 		BufferBinding bufferBinding,
 		IndexElementSize indexElementSize
-	) {
+	)
+	{
 		SDL_GPU.SDL_BindGPUIndexBuffer(
 			Handle,
 			bufferBinding,
@@ -118,7 +123,8 @@ public class RenderPass
 	public void BindVertexSamplers(
 		uint slot,
 		params Span<TextureSamplerBinding> textureSamplerBindings
-	) {
+	)
+	{
 		SDL_GPU.SDL_BindGPUVertexSamplers(
 			Handle,
 			slot,
@@ -141,10 +147,12 @@ public class RenderPass
 	public void BindVertexStorageTextures(
 		uint slot,
 		params Span<Texture> textures
-	) {
+	)
+	{
 		Span<IntPtr> handlePtr = stackalloc nint[textures.Length];
 
-		for (var i = 0; i < textures.Length; i += 1) {
+		for (var i = 0; i < textures.Length; i += 1)
+		{
 			handlePtr[i] = textures[i].Handle;
 		}
 
@@ -170,10 +178,12 @@ public class RenderPass
 	public void BindVertexStorageBuffers(
 		uint slot,
 		params Span<Buffer> buffers
-	) {
+	)
+	{
 		Span<IntPtr> handlePtr = stackalloc nint[buffers.Length];
 
-		for (var i = 0; i < buffers.Length; i += 1) {
+		for (var i = 0; i < buffers.Length; i += 1)
+		{
 			handlePtr[i] = buffers[i].Handle;
 		}
 
@@ -199,7 +209,8 @@ public class RenderPass
 	public void BindFragmentSamplers(
 		uint slot,
 		params Span<TextureSamplerBinding> textureSamplerBindings
-	) {
+	)
+	{
 		SDL_GPU.SDL_BindGPUFragmentSamplers(
 			Handle,
 			slot,
@@ -222,10 +233,12 @@ public class RenderPass
 	public void BindFragmentStorageTextures(
 		uint slot,
 		params Span<Texture> textures
-	) {
+	)
+	{
 		Span<IntPtr> handlePtr = stackalloc nint[textures.Length];
 
-		for (var i = 0; i < textures.Length; i += 1) {
+		for (var i = 0; i < textures.Length; i += 1)
+		{
 			handlePtr[i] = textures[i].Handle;
 		}
 
@@ -251,10 +264,12 @@ public class RenderPass
 	public void BindFragmentStorageBuffers(
 		uint slot,
 		params Span<Buffer> buffers
-	) {
+	)
+	{
 		Span<IntPtr> handlePtr = stackalloc nint[buffers.Length];
 
-		for (var i = 0; i < buffers.Length; i += 1) {
+		for (var i = 0; i < buffers.Length; i += 1)
+		{
 			handlePtr[i] = buffers[i].Handle;
 		}
 
@@ -281,7 +296,8 @@ public class RenderPass
 		uint firstIndex,
 		int vertexOffset,
 		uint firstInstance
-	) {
+	)
+	{
 		SDL_GPU.SDL_DrawGPUIndexedPrimitives(
 			Handle,
 			indexCount,
@@ -322,7 +338,8 @@ public class RenderPass
 		Buffer buffer,
 		uint offsetInBytes,
 		uint drawCount
-	) {
+	)
+	{
 		SDL_GPU.SDL_DrawGPUPrimitivesIndirect(
 			Handle,
 			buffer.Handle,
@@ -342,7 +359,8 @@ public class RenderPass
 		Buffer buffer,
 		uint offsetInBytes,
 		uint drawCount
-	) {
+	)
+	{
 		SDL_GPU.SDL_DrawGPUIndexedPrimitivesIndirect(
 			Handle,
 			buffer.Handle,

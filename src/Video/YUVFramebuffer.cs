@@ -32,7 +32,8 @@ internal class YUVFramebuffer : IDisposable
 		uint yHeight,
 		uint uvWidth,
 		uint uvHeight
-	) {
+	)
+	{
 		if (YDataBufferLength < ySpan.Length)
 		{
 			YDataBuffer = (nint) NativeMemory.Realloc((void*) YDataBuffer, (nuint) ySpan.Length);
@@ -78,8 +79,8 @@ internal class YUVFramebuffer : IDisposable
 
 	~YUVFramebuffer()
 	{
-	    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-	    Dispose(disposing: false);
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose(disposing: false);
 	}
 
 	public void Dispose()

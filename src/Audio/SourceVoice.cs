@@ -40,16 +40,16 @@ namespace MoonWorks.Audio
 			this.format = format;
 			var fAudioFormat = format.ToFAudioFormat();
 
-			 FAudio.FAudio_CreateSourceVoice(
-				device.Handle,
-				out handle,
-				ref fAudioFormat,
-				FAudio.FAUDIO_VOICE_USEFILTER,
-				FAudio.FAUDIO_DEFAULT_FREQ_RATIO,
-				IntPtr.Zero,
-				IntPtr.Zero, // default sends to mastering voice!
-				IntPtr.Zero
-			);
+			FAudio.FAudio_CreateSourceVoice(
+			   device.Handle,
+			   out handle,
+			   ref fAudioFormat,
+			   FAudio.FAUDIO_VOICE_USEFILTER,
+			   FAudio.FAUDIO_DEFAULT_FREQ_RATIO,
+			   IntPtr.Zero,
+			   IntPtr.Zero, // default sends to mastering voice!
+			   IntPtr.Zero
+		   );
 
 			SetOutputVoice(device.MasteringVoice);
 		}

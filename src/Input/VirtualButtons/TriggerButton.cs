@@ -22,8 +22,8 @@ namespace MoonWorks.Input
 		}
 
 		internal void Update()
-        {
-            UpdateState(Parent.Value >= Threshold);
-        }
+		{
+			UpdateState(Parent.Value >= Threshold);
+		}
 	}
 }

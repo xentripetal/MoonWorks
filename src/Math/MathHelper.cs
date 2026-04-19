@@ -1,4 +1,4 @@
-﻿/* MoonWorks - Game Development Framework
+/* MoonWorks - Game Development Framework
  * Copyright 2021-2024 Evan Hemsley
  */
 
@@ -185,43 +185,43 @@ public static class MathHelper
 	}
 
 	/// <summary>
-        /// Step from start towards end by change.
-        /// </summary>
-        /// <param name="start">Start value.</param>
-        /// <param name="end">End value.</param>
-        /// <param name="change">Change value.</param>
-        public static float Approach(float start, float end, float change)
-        {
-            return start < end ?
-                System.Math.Min(start + change, end) :
-                System.Math.Max(start - change, end);
-        }
-
-	/// <summary>
-        /// Step from start towards end by change.
-        /// </summary>
-        /// <param name="start">Start value.</param>
-        /// <param name="end">End value.</param>
-        /// <param name="change">Change value.</param>
-	public static int Approach(int start, int end, int change)
+	/// Step from start towards end by change.
+	/// </summary>
+	/// <param name="start">Start value.</param>
+	/// <param name="end">End value.</param>
+	/// <param name="change">Change value.</param>
+	public static float Approach(float start, float end, float change)
 	{
 		return start < end ?
-                System.Math.Min(start + change, end) :
-                System.Math.Max(start - change, end);
+			System.Math.Min(start + change, end) :
+			System.Math.Max(start - change, end);
 	}
 
 	/// <summary>
-        /// Step from start towards end by change.
-        /// </summary>
-        /// <param name="start">Start value.</param>
-        /// <param name="end">End value.</param>
-        /// <param name="change">Change value.</param>
-        public static Fixed.Fix64 Approach(Fixed.Fix64 start, Fixed.Fix64 end, Fixed.Fix64 change)
-        {
-            return start < end ?
-                Fixed.Fix64.Min(start + change, end) :
-                Fixed.Fix64.Max(start - change, end);
-        }
+	/// Step from start towards end by change.
+	/// </summary>
+	/// <param name="start">Start value.</param>
+	/// <param name="end">End value.</param>
+	/// <param name="change">Change value.</param>
+	public static int Approach(int start, int end, int change)
+	{
+		return start < end ?
+				System.Math.Min(start + change, end) :
+				System.Math.Max(start - change, end);
+	}
+
+	/// <summary>
+	/// Step from start towards end by change.
+	/// </summary>
+	/// <param name="start">Start value.</param>
+	/// <param name="end">End value.</param>
+	/// <param name="change">Change value.</param>
+	public static Fixed.Fix64 Approach(Fixed.Fix64 start, Fixed.Fix64 end, Fixed.Fix64 change)
+	{
+		return start < end ?
+			Fixed.Fix64.Min(start + change, end) :
+			Fixed.Fix64.Max(start - change, end);
+	}
 
 	internal static bool WithinEpsilon(float floatA, float floatB)
 	{

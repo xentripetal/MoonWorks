@@ -1,4 +1,4 @@
-﻿namespace MoonWorks.Input
+namespace MoonWorks.Input
 {
 	/// <summary>
 	/// Represents the current status of a binary input.

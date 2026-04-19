@@ -1,6 +1,7 @@
 namespace MoonWorks.Graphics;
 
-public enum IOVarType {
+public enum IOVarType
+{
 	Unknown,
 	Int8,
 	Uint8,

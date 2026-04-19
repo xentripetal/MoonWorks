@@ -2,7 +2,7 @@ namespace MoonWorks.Input
 {
 	/// <summary>
 	/// Can be used to access a gamepad button without a direct reference to the button object.
- 	/// Enum values are equivalent to the SDL_GamepadButton value.
+	/// Enum values are equivalent to the SDL_GamepadButton value.
 	/// </summary>
 	public enum GamepadButtonCode
 	{

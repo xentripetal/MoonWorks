@@ -8,18 +8,18 @@ namespace MoonWorks.Input;
 /// </summary>
 public enum GamepadType
 {
-    Unknown = 0,
-    Standard,
-    Xbox360,
-    XboxOne,
-    PS3,
-    PS4,
-    PS5,
-    SwitchPro,
-    SwitchJoyConLeft,
-    SwitchJoyConRight,
-    SwitchJoyConPair,
-    GameCube
+	Unknown = 0,
+	Standard,
+	Xbox360,
+	XboxOne,
+	PS3,
+	PS4,
+	PS5,
+	SwitchPro,
+	SwitchJoyConLeft,
+	SwitchJoyConRight,
+	SwitchJoyConPair,
+	GameCube
 }
 
 /// <summary>
@@ -27,8 +27,8 @@ public enum GamepadType
 /// </summary>
 public enum GamepadFamily
 {
-    Generic,
-    Xbox,
-    PlayStation,
-    Nintendo
+	Generic,
+	Xbox,
+	PlayStation,
+	Nintendo
 }

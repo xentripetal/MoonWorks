@@ -1,4 +1,4 @@
-﻿namespace MoonWorks
+namespace MoonWorks
 {
 	/// <summary>
 	/// All the information required for window creation.

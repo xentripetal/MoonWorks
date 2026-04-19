@@ -1,4 +1,4 @@
-﻿namespace MoonWorks.Audio
+namespace MoonWorks.Audio
 {
 	public enum SoundState
 	{

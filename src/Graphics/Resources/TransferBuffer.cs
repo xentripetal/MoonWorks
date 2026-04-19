@@ -70,7 +70,8 @@ public class TransferBuffer : SDLGPUResource
 	public static TransferBuffer Create(
 		GraphicsDevice device,
 		in TransferBufferCreateInfo createInfo
-	) {
+	)
+	{
 		var handle = SDL.SDL_CreateGPUTransferBuffer(device.Handle, createInfo);
 		if (handle == IntPtr.Zero)
 		{

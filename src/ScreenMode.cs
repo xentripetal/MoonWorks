@@ -1,4 +1,4 @@
-﻿namespace MoonWorks
+namespace MoonWorks
 {
 	public enum ScreenMode
 	{

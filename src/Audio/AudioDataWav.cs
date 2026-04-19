@@ -8,7 +8,7 @@ namespace MoonWorks.Audio
 	{
 		const int MAGIC_RIFF = 0x46464952;
 		const int MAGIC_WAVE = 0x45564157;
-		const int MAGIC_FMT  = 0x20746d66;
+		const int MAGIC_FMT = 0x20746d66;
 		const int MAGIC_DATA = 0x61746164;
 
 		private ref struct ParseResult

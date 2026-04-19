@@ -63,7 +63,7 @@ public enum TextureFormat
 	BC5_RGUnorm = 17,
 	BC7_RGBAUnorm = 18,
 	BC6H_RGBFloat = 19,
- 	BC6H_RGBUfloat = 20,
+	BC6H_RGBUfloat = 20,
 	R8Snorm = 21,
 	R8G8Snorm = 22,
 	R8G8B8A8Snorm = 23,
@@ -1736,7 +1736,8 @@ internal static partial class SDL_ShaderCross
 		Compute
 	}
 
-	public enum IOVarType {
+	public enum IOVarType
+	{
 		Unknown,
 		Int8,
 		Uint8,

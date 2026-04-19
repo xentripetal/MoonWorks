@@ -35,7 +35,7 @@ namespace MoonWorks
 		/// <summary>
 		/// Specifies the frame pacing strategy of the Game's tick loop.
 		/// </summary>
-		public FramePacingMode Mode { get; private set;}
+		public FramePacingMode Mode { get; private set; }
 
 		/// <summary>
 		/// Represents how often Game.Update will called.
@@ -57,7 +57,8 @@ namespace MoonWorks
 		public static FramePacingSettings CreateLatencyOptimized(
 			int timestepFPS,
 			int maxUpdatesPerTick
-		) {
+		)
+		{
 			return new FramePacingSettings(
 				FramePacingMode.LatencyOptimized,
 				timestepFPS,
@@ -72,7 +73,8 @@ namespace MoonWorks
 		public static FramePacingSettings CreateCapped(
 			int timestepFPS,
 			int maxUpdatesPerTick
-		) {
+		)
+		{
 			return new FramePacingSettings(
 				FramePacingMode.Capped,
 				timestepFPS,
@@ -88,7 +90,8 @@ namespace MoonWorks
 		public static FramePacingSettings CreateUncapped(
 			int timestepFPS,
 			int maxUpdatesPerTick
-		) {
+		)
+		{
 			return new FramePacingSettings(
 				FramePacingMode.Uncapped,
 				timestepFPS,
@@ -100,7 +103,8 @@ namespace MoonWorks
 			FramePacingMode mode,
 			int timestepFPS,
 			int maxUpdatesPerTick
-		) {
+		)
+		{
 			Mode = mode;
 			Timestep = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / timestepFPS);
 			MaxUpdatesPerTick = maxUpdatesPerTick;

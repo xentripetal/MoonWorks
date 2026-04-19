@@ -251,12 +251,12 @@ namespace MoonWorks.Audio
 					}
 				}
 
-				#if DEBUG
+#if DEBUG
 				if (ReverbEffect == null)
 				{
 					Logger.LogWarn("Tried to set reverb value before applying a reverb effect");
 				}
-				#endif
+#endif
 			}
 		}
 

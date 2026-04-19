@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace MoonWorks.Audio
@@ -35,12 +35,12 @@ namespace MoonWorks.Audio
 
 		~AudioResource()
 		{
-			#if DEBUG
+#if DEBUG
 			// If you see this log message, you leaked an audio resource without disposing it!
 			// We can't clean it up for you because this can cause catastrophic issues.
 			// You should really fix this when it happens.
 			Logger.LogWarn($"A resource of type {GetType().Name} was not Disposed.");
-			#endif
+#endif
 		}
 
 		public void Dispose()

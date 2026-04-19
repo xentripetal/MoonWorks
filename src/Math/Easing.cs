@@ -25,7 +25,8 @@ public static class Easing
 		System.Func<float, float> outFunc,
 		System.Func<float, float> inFunc,
 		float t
-	) {
+	)
+	{
 		if (t < 0.5f)
 		{
 			return outFunc(t);
@@ -40,7 +41,8 @@ public static class Easing
 		System.Func<Fix64, Fix64> outFunc,
 		System.Func<Fix64, Fix64> inFunc,
 		Fix64 t
-	) {
+	)
+	{
 		if (t < HALF)
 		{
 			return outFunc(t);
@@ -63,7 +65,8 @@ public static class Easing
 		float holdDuration,
 		float releaseDuration,
 		Function.Float releaseEasingFunction
-	) {
+	)
+	{
 		if (time < attackDuration)
 		{
 			return Interp(start, hold, time, attackDuration, Function.Get(attackEasingFunction));
@@ -88,7 +91,8 @@ public static class Easing
 		Fix64 holdDuration,
 		Fix64 releaseDuration,
 		Function.Fixed releaseEasingFunction
-	) {
+	)
+	{
 		if (time < attackDuration)
 		{
 			return Interp(start, hold, time, attackDuration, Function.Get(attackEasingFunction));
@@ -446,7 +450,8 @@ public static class Easing
 		{
 			return N1 * t * t;
 		}
-		else if (t < 2 / D1) {
+		else if (t < 2 / D1)
+		{
 			return N1 * (t -= 1.5f / D1) * t + 0.75f;
 		}
 		else if (t < 2.5f / D1)
@@ -679,7 +684,8 @@ public static class Easing
 		{
 			return FIXED_N1 * t * t;
 		}
-		else if (t < 2 / FIXED_D1) {
+		else if (t < 2 / FIXED_D1)
+		{
 			return FIXED_N1 * (t -= Fix64.FromFraction(3, 2) / FIXED_D1) * t + Fix64.FromFraction(3, 4);
 		}
 		else if (t < Fix64.FromFraction(5, 2) / FIXED_D1)

@@ -70,12 +70,12 @@ namespace MoonWorks.Graphics.Font
 
 			for (int i = 0, j = 0; i < MAX_INDEX_COUNT; i += 6, j += 4)
 			{
-				indexSpan[i]     =  (uint) j;
-				indexSpan[i + 1] =  (uint) j + 1;
-				indexSpan[i + 2] =  (uint) j + 2;
-				indexSpan[i + 3] =  (uint) j + 3;
-				indexSpan[i + 4] =  (uint) j + 2;
-				indexSpan[i + 5] =  (uint) j + 1;
+				indexSpan[i] = (uint) j;
+				indexSpan[i + 1] = (uint) j + 1;
+				indexSpan[i + 2] = (uint) j + 2;
+				indexSpan[i + 3] = (uint) j + 3;
+				indexSpan[i + 4] = (uint) j + 2;
+				indexSpan[i + 5] = (uint) j + 1;
 			}
 			spriteIndexTransferBuffer.Unmap();
 
@@ -118,7 +118,8 @@ namespace MoonWorks.Graphics.Font
 			Color color,
 			HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
 			VerticalAlignment verticalAlignment = VerticalAlignment.Baseline
-		) {
+		)
+		{
 			if (!FontIndices.TryGetValue(font, out uint fontIndex))
 			{
 				fontIndex = CurrentFontIndex;
@@ -192,7 +193,7 @@ namespace MoonWorks.Graphics.Font
 					{
 						Buffer = ChunkDataBuffer.Handle,
 						Offset = 0,
-						Size = (uint)(ChunkCount * ChunkDataSize)
+						Size = (uint) (ChunkCount * ChunkDataSize)
 					},
 					true
 				);
@@ -220,7 +221,8 @@ namespace MoonWorks.Graphics.Font
 		public void Render(
 			RenderPass renderPass,
 			Matrix4x4 viewProjectionMatrix
-		) {
+		)
+		{
 			renderPass.CommandBuffer.PushVertexUniformData(viewProjectionMatrix);
 
 			renderPass.BindFragmentSamplers(FontTextureBindings);

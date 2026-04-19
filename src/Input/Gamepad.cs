@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SDL3;
 
@@ -330,21 +330,21 @@ namespace MoonWorks.Input
 
 			ButtonEvents = new List<SDL.SDL_GamepadButtonEvent>[EnumToButton.Count];
 			for (var i = 0; i < EnumToButton.Count; i += 1)
-            {
-                ButtonEvents[i] = [];
-            }
+			{
+				ButtonEvents[i] = [];
+			}
 
 			AxisEvents = new List<SDL.SDL_GamepadAxisEvent>[EnumToAxis.Count];
 			for (var i = 0; i < EnumToAxis.Count; i += 1)
-            {
-                AxisEvents[i] = [];
-            }
+			{
+				AxisEvents[i] = [];
+			}
 
 			TriggerEvents = new List<SDL.SDL_GamepadAxisEvent>[EnumToTrigger.Count];
 			for (var i = 0; i < EnumToTrigger.Count; i += 1)
-            {
-                TriggerEvents[i] = [];
-            }
+			{
+				TriggerEvents[i] = [];
+			}
 		}
 
 		internal void Register(IntPtr handle)
@@ -386,24 +386,24 @@ namespace MoonWorks.Input
 		}
 
 		internal void AddButtonEvent(SDL.SDL_GamepadButtonEvent evt)
-        {
+		{
 			ButtonEvents[evt.button].Add(evt);
-        }
+		}
 
 		internal void AddAxisEvent(SDL.SDL_GamepadAxisEvent evt)
-        {
+		{
 			if (EnumToAxis.TryGetValue((SDL.SDL_GamepadAxis) evt.axis, out var axis))
-            {
-                AxisEvents[(int) axis.Code].Add(evt);
-            }
+			{
+				AxisEvents[(int) axis.Code].Add(evt);
+			}
 			else if (EnumToTrigger.TryGetValue((SDL.SDL_GamepadAxis) evt.axis, out var trigger))
-            {
-                TriggerEvents[(int) trigger.Code - 4].Add(evt);
-            }
-        }
+			{
+				TriggerEvents[(int) trigger.Code - 4].Add(evt);
+			}
+		}
 
 		private static bool ButtonWasPressed(ulong frameTimestamp, List<SDL.SDL_GamepadButtonEvent> events)
-        {
+		{
 			foreach (var buttonEvent in events)
 			{
 				if (buttonEvent.down && Inputs.TimestampDifference(frameTimestamp, buttonEvent.timestamp) < Inputs.ButtonDiscardThreshold)
@@ -412,7 +412,7 @@ namespace MoonWorks.Input
 				}
 			}
 			return false;
-        }
+		}
 
 		internal void Update(ulong timestamp)
 		{
@@ -423,32 +423,32 @@ namespace MoonWorks.Input
 				// Update input state from events
 
 				foreach (var button in EnumToButton.Values)
-                {
-                    var events = ButtonEvents[(int) button.Code];
+				{
+					var events = ButtonEvents[(int) button.Code];
 
 					// by default, the button pressed state is whatever it was last time
 					bool isDown = button.Down;
 					bool wasPressed = isDown;
 
 					if (events.Count > 0)
-                    {
+					{
 						// if we have events, determine whether the button was pressed and its current press state
-                        wasPressed = ButtonWasPressed(timestamp, events);
+						wasPressed = ButtonWasPressed(timestamp, events);
 						isDown = events[^1].down;
 						events.Clear();
-                    }
+					}
 
 					button.Update(wasPressed, isDown);
-                }
+				}
 
 				foreach (var axis in EnumToAxis.Values)
 				{
 					var events = AxisEvents[(int) axis.Code];
 					if (events.Count > 0)
-                    {
+					{
 						var latest = events[^1];
-                        axis.SetValue(latest.value);
-                    }
+						axis.SetValue(latest.value);
+					}
 
 					switch (axis.Code)
 					{
@@ -480,10 +480,10 @@ namespace MoonWorks.Input
 				{
 					var events = TriggerEvents[(int) trigger.Code - 4];
 					if (events.Count > 0)
-                    {
+					{
 						var latest = events[^1];
 						trigger.SetValue(latest.value);
-                    }
+					}
 
 					switch (trigger.Code)
 					{

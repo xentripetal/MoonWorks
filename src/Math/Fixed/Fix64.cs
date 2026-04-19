@@ -35,8 +35,8 @@ namespace MoonWorks.Math.Fixed
 		static readonly Fix64 Log2Max = new Fix64(LOG2MAX);
 		static readonly Fix64 Log2Min = new Fix64(LOG2MIN);
 
-		const int LUT_SIZE = (int)(PI_OVER_2 >> 15);
-		static readonly Fix64 LutInterval = (Fix64)(LUT_SIZE - 1) / PiOver2;
+		const int LUT_SIZE = (int) (PI_OVER_2 >> 15);
+		static readonly Fix64 LutInterval = (Fix64) (LUT_SIZE - 1) / PiOver2;
 
 		public bool IsFractional => (RawValue & 0x00000000FFFFFFFF) != 0;
 		public bool IsIntegral => (RawValue & 0x00000000FFFFFFFF) == 0;
@@ -111,7 +111,7 @@ namespace MoonWorks.Math.Fixed
 		public static Fix64 Floor(Fix64 value)
 		{
 			// Zero out the fractional part.
-			return new Fix64((long)((ulong)value.RawValue & 0xFFFFFFFF00000000));
+			return new Fix64((long) ((ulong) value.RawValue & 0xFFFFFFFF00000000));
 		}
 
 		/// <summary>
@@ -222,7 +222,7 @@ namespace MoonWorks.Math.Fixed
 
 			if (x == One)
 			{
-				return neg ? One / (Fix64)2 : (Fix64)2;
+				return neg ? One / (Fix64) 2 : (Fix64) 2;
 			}
 			if (x >= Log2Max)
 			{
@@ -240,7 +240,7 @@ namespace MoonWorks.Math.Fixed
 			 * When the sum term drops to zero, we can stop summing.
 			 */
 
-			int integerPart = (int)Floor(x);
+			int integerPart = (int) Floor(x);
 			// Take fractional part of exponent
 			x = new Fix64(x.RawValue & 0x00000000FFFFFFFF);
 
@@ -249,7 +249,7 @@ namespace MoonWorks.Math.Fixed
 			int i = 1;
 			while (term.RawValue != 0)
 			{
-				term = FastMul(FastMul(x, term), Ln2) / (Fix64)i;
+				term = FastMul(FastMul(x, term), Ln2) / (Fix64) i;
 				result += term;
 				i++;
 			}
@@ -354,7 +354,7 @@ namespace MoonWorks.Math.Fixed
 				throw new ArgumentOutOfRangeException("Negative value passed to Sqrt", "x");
 			}
 
-			var num = (ulong)xl;
+			var num = (ulong) xl;
 			var result = 0UL;
 
 			// second-to-top bit
@@ -413,7 +413,7 @@ namespace MoonWorks.Math.Fixed
 			{
 				++result;
 			}
-			return new Fix64((long)result);
+			return new Fix64((long) result);
 		}
 
 		private static long ClampSinValue(long angle, out bool flipHorizontal, out bool flipVertical)
@@ -486,11 +486,11 @@ namespace MoonWorks.Math.Fixed
 			var indexError = FastSub(rawIndex, roundedIndex);
 
 			var nearestValue = new Fix64(Fix64Lut.Sin[flipHorizontal ?
-				Fix64Lut.Sin.Length - 1 - (int)roundedIndex :
-				(int)roundedIndex]);
+				Fix64Lut.Sin.Length - 1 - (int) roundedIndex :
+				(int) roundedIndex]);
 			var secondNearestValue = new Fix64(Fix64Lut.Sin[flipHorizontal ?
-				Fix64Lut.Sin.Length - 1 - (int)roundedIndex - Sign(indexError) :
-				(int)roundedIndex + Sign(indexError)]);
+				Fix64Lut.Sin.Length - 1 - (int) roundedIndex - Sign(indexError) :
+				(int) roundedIndex + Sign(indexError)]);
 
 			var delta = FastMul(indexError, FastAbs(FastSub(nearestValue, secondNearestValue))).RawValue;
 			var interpolatedValue = nearestValue.RawValue + (flipHorizontal ? -delta : delta);
@@ -533,8 +533,8 @@ namespace MoonWorks.Math.Fixed
 			var roundedIndex = Round(rawIndex);
 			var indexError = FastSub(rawIndex, roundedIndex);
 
-			var nearestValue = new Fix64(Fix64Lut.Tan[(int)roundedIndex]);
-			var secondNearestValue = new Fix64(Fix64Lut.Tan[(int)roundedIndex + Sign(indexError)]);
+			var nearestValue = new Fix64(Fix64Lut.Tan[(int) roundedIndex]);
+			var secondNearestValue = new Fix64(Fix64Lut.Tan[(int) roundedIndex + Sign(indexError)]);
 
 			var delta = FastMul(indexError, FastAbs(FastSub(nearestValue, secondNearestValue))).RawValue;
 			var interpolatedValue = nearestValue.RawValue + delta;
@@ -558,8 +558,8 @@ namespace MoonWorks.Math.Fixed
 			}
 
 			Fix64 result;
-			var two = (Fix64)2;
-			var three = (Fix64)3;
+			var two = (Fix64) 2;
+			var three = (Fix64) 3;
 
 			bool invert = z > One;
 			if (invert) z = One / z;
@@ -717,14 +717,14 @@ namespace MoonWorks.Math.Fixed
 			var xl = x.RawValue;
 			var yl = y.RawValue;
 
-			var xlo = (ulong)(xl & 0x00000000FFFFFFFF);
+			var xlo = (ulong) (xl & 0x00000000FFFFFFFF);
 			var xhi = xl >> FRACTIONAL_PLACES;
-			var ylo = (ulong)(yl & 0x00000000FFFFFFFF);
+			var ylo = (ulong) (yl & 0x00000000FFFFFFFF);
 			var yhi = yl >> FRACTIONAL_PLACES;
 
 			var lolo = xlo * ylo;
-			var lohi = (long)xlo * yhi;
-			var hilo = xhi * (long)ylo;
+			var lohi = (long) xlo * yhi;
+			var hilo = xhi * (long) ylo;
 			var hihi = xhi * yhi;
 
 			var loResult = lolo >> FRACTIONAL_PLACES;
@@ -733,7 +733,7 @@ namespace MoonWorks.Math.Fixed
 			var hiResult = hihi << FRACTIONAL_PLACES;
 
 			bool overflow = false;
-			var sum = AddOverflowHelper((long)loResult, midResult1, ref overflow);
+			var sum = AddOverflowHelper((long) loResult, midResult1, ref overflow);
 			sum = AddOverflowHelper(sum, midResult2, ref overflow);
 			sum = AddOverflowHelper(sum, hiResult, ref overflow);
 
@@ -794,14 +794,14 @@ namespace MoonWorks.Math.Fixed
 			var xl = x.RawValue;
 			var yl = y.RawValue;
 
-			var xlo = (ulong)(xl & 0x00000000FFFFFFFF);
+			var xlo = (ulong) (xl & 0x00000000FFFFFFFF);
 			var xhi = xl >> FRACTIONAL_PLACES;
-			var ylo = (ulong)(yl & 0x00000000FFFFFFFF);
+			var ylo = (ulong) (yl & 0x00000000FFFFFFFF);
 			var yhi = yl >> FRACTIONAL_PLACES;
 
 			var lolo = xlo * ylo;
-			var lohi = (long)xlo * yhi;
-			var hilo = xhi * (long)ylo;
+			var lohi = (long) xlo * yhi;
+			var hilo = xhi * (long) ylo;
 			var hihi = xhi * yhi;
 
 			var loResult = lolo >> FRACTIONAL_PLACES;
@@ -809,7 +809,7 @@ namespace MoonWorks.Math.Fixed
 			var midResult2 = hilo;
 			var hiResult = hihi << FRACTIONAL_PLACES;
 
-			var sum = (long)loResult + midResult1 + midResult2 + hiResult;
+			var sum = (long) loResult + midResult1 + midResult2 + hiResult;
 			return new Fix64(sum);
 		}
 
@@ -842,8 +842,8 @@ namespace MoonWorks.Math.Fixed
 				throw new DivideByZeroException();
 			}
 
-			var remainder = (ulong)(xl >= 0 ? xl : -xl);
-			var divider = (ulong)(yl >= 0 ? yl : -yl);
+			var remainder = (ulong) (xl >= 0 ? xl : -xl);
+			var divider = (ulong) (yl >= 0 ? yl : -yl);
 			var quotient = 0UL;
 			var bitPos = NUM_BITS / 2 + 1;
 
@@ -881,7 +881,7 @@ namespace MoonWorks.Math.Fixed
 
 			// rounding
 			++quotient;
-			var result = (long)(quotient >> 1);
+			var result = (long) (quotient >> 1);
 			if (((xl ^ yl) & MIN_VALUE) != 0)
 			{
 				result = -result;
@@ -987,32 +987,32 @@ namespace MoonWorks.Math.Fixed
 
 		public static explicit operator Fix64(float value)
 		{
-			return new Fix64((long)(value * ONE));
+			return new Fix64((long) (value * ONE));
 		}
 
 		public static explicit operator float(Fix64 value)
 		{
-			return (float)value.RawValue / ONE;
+			return (float) value.RawValue / ONE;
 		}
 
 		public static explicit operator Fix64(double value)
 		{
-			return new Fix64((long)(value * ONE));
+			return new Fix64((long) (value * ONE));
 		}
 
 		public static explicit operator double(Fix64 value)
 		{
-			return (double)value.RawValue / ONE;
+			return (double) value.RawValue / ONE;
 		}
 
 		public static explicit operator Fix64(decimal value)
 		{
-			return new Fix64((long)(value * ONE));
+			return new Fix64((long) (value * ONE));
 		}
 
 		public static explicit operator decimal(Fix64 value)
 		{
-			return (decimal)value.RawValue / ONE;
+			return (decimal) value.RawValue / ONE;
 		}
 
 		public int CompareTo(Fix64 other)
@@ -1039,7 +1039,7 @@ namespace MoonWorks.Math.Fixed
 		public override string ToString()
 		{
 			// Up to 10 decimal places
-			return ((decimal)this).ToString("0.##########");
+			return ((decimal) this).ToString("0.##########");
 		}
 
 		public string ToString(System.Globalization.CultureInfo ci)
