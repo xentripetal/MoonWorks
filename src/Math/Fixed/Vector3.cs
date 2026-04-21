@@ -102,8 +102,8 @@ namespace MoonWorks.Math.Fixed
 			this.Z = z;
 		}
 
-		public Vector3(int x, int y, int z)
-		{
+        public Vector3(int x, int y, int z)
+        {
 			this.X = new Fix64(x);
 			this.Y = new Fix64(y);
 			this.Z = new Fix64(z);

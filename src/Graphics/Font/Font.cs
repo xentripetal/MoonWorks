@@ -25,8 +25,7 @@ namespace MoonWorks.Graphics.Font
 			GraphicsDevice graphicsDevice,
 			TitleStorage storage,
 			string fontPath
-		)
-		{
+		) {
 			if (!storage.GetFileSize(fontPath, out var fontBytesLength))
 			{
 				return null;
@@ -97,8 +96,7 @@ namespace MoonWorks.Graphics.Font
 			HorizontalAlignment horizontalAlignment,
 			VerticalAlignment verticalAlignment,
 			out Wellspring.Rectangle rectangle
-		)
-		{
+		) {
 			var byteCount = System.Text.Encoding.UTF8.GetByteCount(text);
 
 			if (StringBytesLength < byteCount)

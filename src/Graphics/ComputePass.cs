@@ -6,7 +6,7 @@ namespace MoonWorks.Graphics;
 public class ComputePass
 {
 	public nint Handle { get; internal set; }
-	public CommandBuffer CommandBuffer { get; internal set; }
+	public CommandBuffer CommandBuffer { get; internal set;}
 
 	/// <summary>
 	/// Binds a compute pipeline so that compute work may be dispatched.
@@ -14,8 +14,7 @@ public class ComputePass
 	/// <param name="computePipeline">The compute pipeline to bind.</param>
 	public void BindComputePipeline(
 		ComputePipeline computePipeline
-	)
-	{
+	) {
 		SDL.SDL_BindGPUComputePipeline(
 			Handle,
 			computePipeline.Handle
@@ -30,8 +29,7 @@ public class ComputePass
 	public void BindSamplers(
 		uint slot,
 		params Span<TextureSamplerBinding> textureSamplerBindings
-	)
-	{
+	) {
 		SDL.SDL_BindGPUComputeSamplers(
 			Handle,
 			slot,
@@ -53,12 +51,10 @@ public class ComputePass
 	public void BindStorageTextures(
 		uint slot,
 		Span<Texture> textures
-	)
-	{
+	) {
 		Span<IntPtr> handlePtr = stackalloc nint[textures.Length];
 
-		for (var i = 0; i < textures.Length; i += 1)
-		{
+		for (var i = 0; i < textures.Length; i += 1) {
 			handlePtr[i] = textures[i].Handle;
 		}
 
@@ -81,12 +77,10 @@ public class ComputePass
 	public void BindStorageBuffers(
 		uint slot,
 		params Span<Buffer> buffers
-	)
-	{
+	) {
 		Span<IntPtr> handlePtr = stackalloc nint[buffers.Length];
 
-		for (var i = 0; i < buffers.Length; i += 1)
-		{
+		for (var i = 0; i < buffers.Length; i += 1) {
 			handlePtr[i] = buffers[i].Handle;
 		}
 
@@ -112,8 +106,7 @@ public class ComputePass
 		uint groupCountX,
 		uint groupCountY,
 		uint groupCountZ
-	)
-	{
+	) {
 		SDL.SDL_DispatchGPUCompute(
 			Handle,
 			groupCountX,
@@ -128,8 +121,7 @@ public class ComputePass
 	public void DispatchIndirect(
 		Buffer buffer,
 		uint offset = 0
-	)
-	{
+	) {
 		SDL.SDL_DispatchGPUComputeIndirect(
 			Handle,
 			buffer.Handle,

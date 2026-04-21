@@ -17,8 +17,7 @@ public static class ImageUtils
 		out uint width,
 		out uint height,
 		out uint sizeInBytes
-	)
-	{
+	) {
 		fixed (byte* ptr = data)
 		{
 			var pixelData =
@@ -49,8 +48,7 @@ public static class ImageUtils
 		out uint width,
 		out uint height,
 		out uint sizeInBytes
-	)
-	{
+	) {
 		width = 0;
 		height = 0;
 		sizeInBytes = 0;
@@ -80,8 +78,7 @@ public static class ImageUtils
 		out uint width,
 		out uint height,
 		out uint sizeInBytes
-	)
-	{
+	) {
 		fixed (byte* ptr = data)
 		{
 			var result =
@@ -110,8 +107,7 @@ public static class ImageUtils
 		out uint width,
 		out uint height,
 		out uint sizeInBytes
-	)
-	{
+	) {
 		width = 0;
 		height = 0;
 		sizeInBytes = 0;
@@ -152,8 +148,7 @@ public static class ImageUtils
 		uint height,
 		bool bgra,
 		out int size
-	)
-	{
+	) {
 		IntPtr pngBuffer;
 
 		if (bgra)
@@ -196,9 +191,8 @@ public static class ImageUtils
 		ReadOnlySpan<byte> buffer,
 		int compressionLevel,
 		out uint compressedLength
-	)
-	{
-		fixed (byte* ptr = buffer)
+	) {
+		fixed (byte *ptr = buffer)
 		{
 			return IRO.IRO_Compress((nint) ptr, (uint) buffer.Length, compressionLevel, out compressedLength);
 		}
@@ -216,10 +210,9 @@ public static class ImageUtils
 	public static unsafe bool Decompress(
 		ReadOnlySpan<byte> compressedData,
 		ReadOnlySpan<byte> destination
-	)
-	{
-		fixed (byte* src = compressedData)
-		fixed (byte* dest = destination)
+	) {
+		fixed (byte *src = compressedData)
+		fixed (byte *dest = destination)
 		{
 			return IRO.IRO_Decompress((nint) src, (nint) dest, (uint) compressedData.Length, (uint) destination.Length);
 		}
@@ -239,8 +232,7 @@ public static class ImageUtils
 		out int height,
 		out int levels,
 		out bool isCube
-	)
-	{
+	) {
 		// A whole bunch of magic numbers, yay DDS!
 		const uint DDS_MAGIC = 0x20534444;
 		const uint DDS_HEADERSIZE = 124;
@@ -454,11 +446,11 @@ public static class ImageUtils
 		}
 		else if ((formatFlags & DDPF_RGB) == DDPF_RGB)
 		{
-			if (formatRGBBitCount != 32 ||
+			if (	formatRGBBitCount != 32 ||
 				formatRBitMask != 0x00FF0000 ||
 				formatGBitMask != 0x0000FF00 ||
 				formatBBitMask != 0x000000FF ||
-				formatABitMask != 0xFF000000)
+				formatABitMask != 0xFF000000	)
 			{
 				Logger.LogError("Unsupported DDS texture format");
 				return false;
@@ -479,8 +471,7 @@ public static class ImageUtils
 		int width,
 		int height,
 		TextureFormat format
-	)
-	{
+	) {
 		if (format == TextureFormat.R8G8B8A8Unorm)
 		{
 			return (((width * 32) + 7) / 8) * height;

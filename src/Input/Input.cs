@@ -1,4 +1,4 @@
-using SDL3;
+﻿using SDL3;
 using System;
 using System.Collections.Generic;
 
@@ -13,10 +13,10 @@ namespace MoonWorks.Input
 		public const int MAX_GAMEPADS = 4;
 
 		/// <summary>
-		/// Button presses older than the discard threshold will be discarded when inputs are processed.
+        /// Button presses older than the discard threshold will be discarded when inputs are processed.
 		/// This can be useful if you want to throw away inputs received during long lag spikes.
 		/// By default, button presses will never be discarded.
-		/// </summary>
+        /// </summary>
 		public static TimeSpan ButtonDiscardThreshold = TimeSpan.MaxValue;
 
 		/// <summary>
@@ -138,14 +138,14 @@ namespace MoonWorks.Input
 		}
 
 		internal Gamepad GetGamepadFromJoystickID(uint index)
-		{
-			if (JoystickIDToGamepad.TryGetValue(index, out var gamepad))
-			{
-				return gamepad;
-			}
+        {
+            if (JoystickIDToGamepad.TryGetValue(index, out var gamepad))
+            {
+                return gamepad;
+            }
 
 			return null;
-		}
+        }
 
 		internal void AddGamepad(uint index)
 		{
@@ -204,8 +204,8 @@ namespace MoonWorks.Input
 		}
 
 		internal static TimeSpan TimestampDifference(ulong frameTimestamp, ulong eventTimestamp)
-		{
-			return new TimeSpan((long) (frameTimestamp - eventTimestamp) / 100);
-		}
+        {
+            return new TimeSpan((long) (frameTimestamp - eventTimestamp) / 100);
+        }
 	}
 }

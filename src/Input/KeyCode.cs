@@ -1,4 +1,4 @@
-namespace MoonWorks.Input;
+﻿namespace MoonWorks.Input;
 
 /// <summary>
 /// KeyCode refers to the value of a button on a keyboard.

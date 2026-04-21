@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SDL3;
 
@@ -59,18 +59,18 @@ namespace MoonWorks.Input
 			}
 
 			for (var i = 0; i < numKeys; i += 1)
-			{
-				ButtonEvents[i] = [];
-			}
+            {
+                ButtonEvents[i] = [];
+            }
 		}
 
 		internal void AddButtonEvent(SDL.SDL_KeyboardEvent evt)
-		{
+        {
 			ButtonEvents[(int) evt.scancode].Add(evt);
-		}
+        }
 
 		private static bool ButtonWasPressed(ulong frameTimestamp, List<SDL.SDL_KeyboardEvent> events)
-		{
+        {
 			foreach (var buttonEvent in events)
 			{
 				if (buttonEvent.down && Inputs.TimestampDifference(frameTimestamp, buttonEvent.timestamp) < Inputs.ButtonDiscardThreshold)
@@ -79,14 +79,14 @@ namespace MoonWorks.Input
 				}
 			}
 			return false;
-		}
+        }
 
 		internal void Update(ulong timestamp)
 		{
 			AnyPressed = false;
 
 			foreach (var button in Keys)
-			{
+            {
 				if (button == null) { continue; }
 
 				var events = ButtonEvents[(int) button.ScanCode];
@@ -95,11 +95,11 @@ namespace MoonWorks.Input
 				bool wasPressed = isDown;
 
 				if (events.Count > 0)
-				{
-					wasPressed = ButtonWasPressed(timestamp, events);
+                {
+                    wasPressed = ButtonWasPressed(timestamp, events);
 					isDown = events[^1].down;
 					events.Clear();
-				}
+                }
 
 				button.Update(wasPressed, isDown);
 
@@ -119,7 +119,7 @@ namespace MoonWorks.Input
 				}
 
 				events.Clear();
-			}
+            }
 		}
 
 		/// <summary>
@@ -182,7 +182,7 @@ namespace MoonWorks.Input
 		/// <summary>
 		/// True if the button was not pressed this frame or the previous frame.
 		/// </summary>
-		public bool IsIdle(KeyCode keycode) => IsIdle(FromKeyCode(keycode));
+		public bool IsIdle(KeyCode keycode)  => IsIdle(FromKeyCode(keycode));
 
 		/// <summary>
 		/// True if the button was either idle or released this frame.
@@ -218,6 +218,6 @@ namespace MoonWorks.Input
 		/// <summary>
 		/// Gets the state of a keyboard button from a keycode.
 		/// </summary>
-		public ButtonState ButtonState(KeyCode keycode) => ButtonState(FromKeyCode(keycode));
+		public ButtonState ButtonState(KeyCode keycode) =>  ButtonState(FromKeyCode(keycode));
 	}
 }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SDL3;
 
 namespace MoonWorks.Input
@@ -63,18 +63,18 @@ namespace MoonWorks.Input
 			ButtonEvents = new List<SDL.SDL_MouseButtonEvent>[CodeToButton.Length];
 
 			for (var i = 0; i < CodeToButton.Length; i += 1)
-			{
-				ButtonEvents[i] = [];
-			}
+            {
+                ButtonEvents[i] = [];
+            }
 		}
 
 		internal void AddButtonEvent(SDL.SDL_MouseButtonEvent evt)
-		{
+        {
 			ButtonEvents[evt.button - 1].Add(evt);
-		}
+        }
 
 		private static bool ButtonWasPressed(ulong frameTimestamp, List<SDL.SDL_MouseButtonEvent> events)
-		{
+        {
 			foreach (var buttonEvent in events)
 			{
 				if (buttonEvent.down && Inputs.TimestampDifference(frameTimestamp, buttonEvent.timestamp) < Inputs.ButtonDiscardThreshold)
@@ -83,7 +83,7 @@ namespace MoonWorks.Input
 				}
 			}
 			return false;
-		}
+        }
 
 		internal void Update(ulong timestamp)
 		{
@@ -104,18 +104,18 @@ namespace MoonWorks.Input
 			previousWheelRawPrecise = WheelRawPrecise;
 
 			foreach (var button in CodeToButton)
-			{
-				var events = ButtonEvents[button.Index - 1];
+            {
+                var events = ButtonEvents[button.Index - 1];
 
 				bool isDown = button.Down;
 				bool wasPressed = isDown;
 
 				if (events.Count > 0)
-				{
-					wasPressed = ButtonWasPressed(timestamp, events);
+                {
+                    wasPressed = ButtonWasPressed(timestamp, events);
 					isDown = events[^1].down;
 					events.Clear();
-				}
+                }
 
 				button.Update(wasPressed, isDown);
 
@@ -125,7 +125,7 @@ namespace MoonWorks.Input
 					AnyPressedButton = button;
 				}
 
-			}
+            }
 		}
 
 		/// <summary>

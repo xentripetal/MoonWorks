@@ -26,8 +26,7 @@ public static class VertexStructs
 		public Byte2Norm(float x, float y) : this(
 			SByteNormalize(x),
 			SByteNormalize(y)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Byte4Norm(sbyte X, sbyte Y, sbyte Z, sbyte W)
@@ -37,8 +36,7 @@ public static class VertexStructs
 			SByteNormalize(y),
 			SByteNormalize(z),
 			SByteNormalize(w)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Ubyte2Norm(byte X, byte Y)
@@ -46,8 +44,7 @@ public static class VertexStructs
 		public Ubyte2Norm(float x, float y) : this(
 			ByteNormalize(x),
 			ByteNormalize(y)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Ubyte4Norm(byte X, byte Y, byte Z, byte W)
@@ -57,8 +54,7 @@ public static class VertexStructs
 			ByteNormalize(y),
 			ByteNormalize(z),
 			ByteNormalize(w)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Short2(short X, short Y);
@@ -71,8 +67,7 @@ public static class VertexStructs
 		public Short2Norm(float x, float y) : this(
 			ShortNormalize(x),
 			ShortNormalize(y)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Short4Norm(short X, short Y, short Z, short W)
@@ -82,8 +77,7 @@ public static class VertexStructs
 			ShortNormalize(y),
 			ShortNormalize(z),
 			ShortNormalize(w)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Ushort2Norm(ushort X, ushort Y)
@@ -91,8 +85,7 @@ public static class VertexStructs
 		public Ushort2Norm(float x, float y) : this(
 			UShortNormalize(x),
 			UShortNormalize(y)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Ushort4Norm(ushort X, ushort Y, ushort Z, ushort W)
@@ -102,8 +95,7 @@ public static class VertexStructs
 			UShortNormalize(y),
 			UShortNormalize(z),
 			UShortNormalize(w)
-		)
-		{ }
+		) { }
 	}
 
 	public record struct Half2(Half X, Half Y);

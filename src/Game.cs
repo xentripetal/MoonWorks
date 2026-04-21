@@ -1,4 +1,4 @@
-using SDL3;
+﻿using SDL3;
 using MoonWorks.Audio;
 using MoonWorks.Graphics;
 using MoonWorks.Input;
@@ -75,8 +75,7 @@ namespace MoonWorks
 			FramePacingSettings framePacingSettings,
 			ShaderFormat availableShaderFormats,
 			bool debugMode = false
-		)
-		{
+		) {
 			AppInfo = appInfo;
 
 			Logger.LogInfo("Starting up MoonWorks...");
@@ -232,8 +231,8 @@ namespace MoonWorks
 		}
 
 		/// <summary>
-		/// Executes once per timestep interval, even when catching up.
-		/// </summary>
+        /// Executes once per timestep interval, even when catching up.
+        /// </summary>
 		protected abstract void Step();
 
 		/// <summary>
@@ -252,20 +251,20 @@ namespace MoonWorks
 		/// <summary>
 		/// You can optionally override this to perform cleanup tasks before the game quits.
 		/// </summary>
-		protected virtual void Destroy() { }
+		protected virtual void Destroy() {}
 
 		/// <summary>
 		/// Called when a file is dropped on the game window.
 		/// </summary>
-		protected virtual void DropFile(string filePath) { }
+		protected virtual void DropFile(string filePath) {}
 
 		/// <summary>
 		/// Required to distinguish between multiple files dropped at once
 		/// vs multiple files dropped one at a time.
 		/// Called once for every multi-file drop.
 		/// </summary>
-		protected virtual void DropBegin() { }
-		protected virtual void DropComplete() { }
+		protected virtual void DropBegin() {}
+		protected virtual void DropComplete() {}
 
 		/// <summary>
 		/// Called for each SDL event before it is routed to input or system queues.
@@ -285,7 +284,7 @@ namespace MoonWorks
 					// but we don't want to oversleep. Requesting repeated 1ms sleeps and
 					// seeing how long we actually slept for lets us estimate the worst case
 					// sleep precision so we don't oversleep the next frame.
-					while (AccumulatedUpdateTime + WorstCaseSleepPrecision < FramePacingSettings.Timestep)
+					while (AccumulatedUpdateTime + WorstCaseSleepPrecision <  FramePacingSettings.Timestep)
 					{
 						System.Threading.Thread.Sleep(1);
 						TimeSpan timeAdvancedSinceSleeping = AdvanceElapsedTime();
@@ -565,28 +564,28 @@ namespace MoonWorks
 		}
 
 		private void HandleGamepadButton(SDL.SDL_GamepadButtonEvent evt)
-		{
+        {
 			var index = evt.which;
 			var gamepad = Inputs.GetGamepadFromJoystickID(index);
 			gamepad?.AddButtonEvent(evt);
-		}
+        }
 
 		private void HandleGamepadAxis(SDL.SDL_GamepadAxisEvent evt)
-		{
+        {
 			var index = evt.which;
 			var gamepad = Inputs.GetGamepadFromJoystickID(index);
 			gamepad?.AddAxisEvent(evt);
-		}
+        }
 
 		private void HandleKeyboardButton(SDL.SDL_KeyboardEvent evt)
-		{
-			Inputs.Keyboard.AddButtonEvent(evt);
-		}
+        {
+            Inputs.Keyboard.AddButtonEvent(evt);
+        }
 
 		private void HandleMouseButton(SDL.SDL_MouseButtonEvent evt)
-		{
-			Inputs.Mouse.AddButtonEvent(evt);
-		}
+        {
+            Inputs.Mouse.AddButtonEvent(evt);
+        }
 
 		public static void ShowRuntimeError(string title, string message)
 		{

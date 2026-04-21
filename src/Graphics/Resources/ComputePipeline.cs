@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using MoonWorks.Storage;
 using SDL = MoonWorks.Graphics.SDL_GPU;
@@ -36,8 +36,7 @@ public class ComputePipeline : SDLGPUResource
 		string filePath,
 		string entryPoint,
 		in ComputePipelineCreateInfo computePipelineCreateInfo
-	)
-	{
+	) {
 		if (!storage.GetFileSize(filePath, out var size))
 		{
 			return null;
@@ -63,8 +62,7 @@ public class ComputePipeline : SDLGPUResource
 		ReadOnlySpan<byte> span,
 		string entryPoint,
 		in ComputePipelineCreateInfo computePipelineCreateInfo
-	)
-	{
+	) {
 		var entryPointBuffer = InteropUtilities.EncodeToUTF8Buffer(entryPoint);
 
 		fixed (byte* spanPtr = span)
@@ -143,8 +141,7 @@ public class ComputePipeline : SDLGPUResource
 		ReadOnlySpan<byte> span,
 		string entryPoint,
 		bool enableDebug
-	)
-	{
+	) {
 		var entryPointBuffer = InteropUtilities.EncodeToUTF8Buffer(entryPoint);
 		var nameBuffer = InteropUtilities.EncodeToUTF8Buffer(name);
 
@@ -212,8 +209,7 @@ public class ComputePipeline : SDLGPUResource
 		string includeDir,
 		bool enableDebug,
 		params Span<ShaderCross.HLSLDefine> defines
-	)
-	{
+	) {
 		var entryPointBuffer = InteropUtilities.EncodeToUTF8Buffer(entryPoint);
 		var includeDirBuffer = InteropUtilities.EncodeToUTF8Buffer(includeDir);
 		var nameBuffer = InteropUtilities.EncodeToUTF8Buffer(name);
@@ -222,8 +218,7 @@ public class ComputePipeline : SDLGPUResource
 		{
 			SDL_ShaderCross.INTERNAL_HLSLDefine* definesBuffer = null;
 
-			if (defines.Length > 0)
-			{
+			if (defines.Length > 0) {
 				definesBuffer = (SDL_ShaderCross.INTERNAL_HLSLDefine*) NativeMemory.Alloc((nuint) (Marshal.SizeOf<SDL_ShaderCross.INTERNAL_HLSLDefine>() * (defines.Length + 1)));
 				for (var i = 0; i < defines.Length; i += 1)
 				{

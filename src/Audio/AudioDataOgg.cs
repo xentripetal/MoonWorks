@@ -41,7 +41,7 @@ namespace MoonWorks.Audio
 
 			BufferDataPtr = (nint) NativeMemory.Alloc((nuint) data.Length);
 
-			fixed (void* ptr = data)
+			fixed (void *ptr = data)
 			{
 				NativeMemory.Copy(ptr, (void*) BufferDataPtr, (nuint) data.Length);
 			}

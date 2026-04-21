@@ -19,10 +19,10 @@ public static class PixelStructs
 		static uint Pack(float r, float g, float b, float a)
 		{
 			return
-				 BitwisePack<uint>(r, 10) |
+				 BitwisePack<uint>(r, 10)        |
 				(BitwisePack<uint>(g, 10) << 10) |
 				(BitwisePack<uint>(b, 10) << 20) |
-				(BitwisePack<uint>(a, 2) << 30);
+				(BitwisePack<uint>(a,  2) << 30);
 		}
 	}
 
@@ -34,7 +34,7 @@ public static class PixelStructs
 		{
 			return (ushort) (
 				(BitwisePack<ushort>(b, 5) << 11) |
-				(BitwisePack<ushort>(g, 6) << 5) |
+				(BitwisePack<ushort>(g, 6) << 5)  |
 				(BitwisePack<ushort>(r, 5))
 			);
 		}
@@ -48,8 +48,8 @@ public static class PixelStructs
 		{
 			return (ushort) (
 				(BitwisePack<ushort>(b, 5) << 10) |
-				(BitwisePack<ushort>(g, 5) << 5) |
-				(BitwisePack<ushort>(r, 5)) |
+				(BitwisePack<ushort>(g, 5) << 5)  |
+				(BitwisePack<ushort>(r, 5))       |
 				(BitwisePack<ushort>(a, 1) << 15)
 			);
 		}
@@ -64,7 +64,7 @@ public static class PixelStructs
 			return (ushort) (
 				(BitwisePack<ushort>(b, 4) << 8) |
 				(BitwisePack<ushort>(g, 4) << 4) |
-				(BitwisePack<ushort>(r, 4)) |
+				(BitwisePack<ushort>(r, 4))      |
 				(BitwisePack<ushort>(a, 4) << 12)
 			);
 		}
