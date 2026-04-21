@@ -70,8 +70,8 @@ namespace MoonWorks.Input
 		}
 
 		internal void Update()
-		{
-			UpdateState(Sign * Parent.Value >= threshold);
-		}
+        {
+            UpdateState(Sign * Parent.Value >= threshold);
+        }
 	}
 }

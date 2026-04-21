@@ -6,7 +6,7 @@ namespace MoonWorks.Graphics;
 public class CopyPass
 {
 	public nint Handle { get; internal set; }
-	public CommandBuffer CommandBuffer { get; internal set; }
+	public CommandBuffer CommandBuffer { get; internal set;}
 
 	/// <summary>
 	/// Uploads data from a TransferBuffer to a TextureSlice.
@@ -22,8 +22,7 @@ public class CopyPass
 		in TextureTransferInfo source,
 		in TextureRegion destination,
 		bool cycle
-	)
-	{
+	) {
 		SDL.SDL_UploadToGPUTexture(
 			Handle,
 			source,
@@ -39,8 +38,7 @@ public class CopyPass
 		TransferBuffer source,
 		Texture destination,
 		bool cycle
-	)
-	{
+	) {
 		UploadToTexture(
 			new TextureTransferInfo
 			{
@@ -72,8 +70,7 @@ public class CopyPass
 		in TransferBufferLocation source,
 		in BufferRegion destination,
 		bool cycle
-	)
-	{
+	) {
 		SDL.SDL_UploadToGPUBuffer(
 			Handle,
 			source,
@@ -89,8 +86,7 @@ public class CopyPass
 		TransferBuffer source,
 		Buffer destination,
 		bool cycle
-	)
-	{
+	) {
 		UploadToBuffer(
 			new TransferBufferLocation
 			{
@@ -153,8 +149,7 @@ public class CopyPass
 		uint h,
 		uint d,
 		bool cycle
-	)
-	{
+	) {
 		SDL.SDL_CopyGPUTextureToTexture(
 			Handle,
 			source,
@@ -177,8 +172,7 @@ public class CopyPass
 		in BufferLocation destination,
 		uint size,
 		bool cycle
-	)
-	{
+	) {
 		SDL.SDL_CopyGPUBufferToBuffer(
 			Handle,
 			source,
@@ -191,8 +185,7 @@ public class CopyPass
 	public void DownloadFromBuffer(
 		in BufferRegion source,
 		in TransferBufferLocation destination
-	)
-	{
+	) {
 		SDL.SDL_DownloadFromGPUBuffer(
 			Handle,
 			source,
@@ -203,8 +196,7 @@ public class CopyPass
 	public void DownloadFromTexture(
 		in TextureRegion source,
 		in TextureTransferInfo destination
-	)
-	{
+	) {
 		SDL.SDL_DownloadFromGPUTexture(
 			Handle,
 			source,

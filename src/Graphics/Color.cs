@@ -1,4 +1,4 @@
-/* MoonWorks - Game Development Framework
+﻿/* MoonWorks - Game Development Framework
  * Copyright 2021 Evan Hemsley
  */
 
@@ -27,8 +27,7 @@ namespace MoonWorks.Graphics
 			(byte) int.Clamp(g, 0, 255),
 			(byte) int.Clamp(b, 0, 255),
 			(byte) int.Clamp(a, 0, 255)
-		)
-		{ }
+		) { }
 
 		/// <summary>
 		/// Constructs an RGBA color from scalars which represent red, green, blue and alpha values.
@@ -42,8 +41,7 @@ namespace MoonWorks.Graphics
 			(byte) (System.Math.Clamp(g, 0, 1) * byte.MaxValue),
 			(byte) (System.Math.Clamp(b, 0, 1) * byte.MaxValue),
 			(byte) (System.Math.Clamp(a, 0, 1) * byte.MaxValue)
-		)
-		{ }
+		) { }
 
 		/// <summary>
 		/// Constructs an RGBA color from scalars which represent red, green, blue values. Alpha is assumed to be 1.
@@ -56,8 +54,7 @@ namespace MoonWorks.Graphics
 			(byte) (System.Math.Clamp(g, 0, 1) * byte.MaxValue),
 			(byte) (System.Math.Clamp(b, 0, 1) * byte.MaxValue),
 			(byte) 255
-		)
-		{ }
+		) { }
 
 		public Color(Vector4 vector) : this(vector.X, vector.Y, vector.Z, vector.W) { }
 
@@ -154,7 +151,7 @@ namespace MoonWorks.Graphics
 		/// <summary>
 		/// Coral color (R:255,G:127,B:80,A:255).
 		/// </summary>
-		public static Color Coral => new(255, 127, 80);
+		public static Color Coral => new (255, 127, 80);
 
 		/// <summary>
 		/// CornflowerBlue color (R:100,G:149,B:237,A:255).
@@ -875,7 +872,7 @@ namespace MoonWorks.Graphics
 			//      the operation simply amounts to performing a "rotate right" on the RGB components
 			//  . The base value to rotate is either (V, B, R) for even slices or (G, V, R) for odd slices
 			//
-			float isOddSlice = hueSliceInteger % 2f;                          // 0 if even (slices 0, 2, 4), 1 if odd (slices 1, 3, 5)
+			float isOddSlice =  hueSliceInteger % 2f;                          // 0 if even (slices 0, 2, 4), 1 if odd (slices 1, 3, 5)
 			float threeSliceSelector = 0.5f * (hueSliceInteger - isOddSlice);  // (0, 1, 2) corresponding to slices (0, 2, 4) and (1, 3, 5)
 
 			Vector3 scrollingRGBForEvenSlices = new Vector3(b, tempRGB.Z, tempRGB.X); // (V, Temp Blue, Temp Red) for even slices (0, 2, 4)

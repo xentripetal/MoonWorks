@@ -31,7 +31,7 @@ public class AsyncFileLoader : IDisposable
 		OnFileLoad Callback // only used with LoadType.Custom
 	);
 
-	Queue LoadQueue = Queue.Create();
+    Queue LoadQueue = Queue.Create();
 
 	GraphicsDevice GraphicsDevice;
 	ResourceUploader ResourceUploader;
@@ -42,14 +42,14 @@ public class AsyncFileLoader : IDisposable
 	public AsyncFileLoaderStatus Status { get; private set; }
 
 	Thread Thread;
-	private bool IsDisposed;
+    private bool IsDisposed;
 
-	public AsyncFileLoader(GraphicsDevice graphicsDevice)
-	{
+    public AsyncFileLoader(GraphicsDevice graphicsDevice)
+    {
 		GraphicsDevice = graphicsDevice;
 		ResourceUploader = new ResourceUploader(GraphicsDevice);
 		Thread = new Thread(ThreadMain);
-	}
+    }
 
 	/// <summary>
 	/// Asynchronously load an arbitrary object from a file using a custom callback.
@@ -165,64 +165,64 @@ public class AsyncFileLoader : IDisposable
 		}
 
 		Status = AsyncFileLoaderStatus.Running;
-		Thread.Start();
+        Thread.Start();
 	}
 
 	// Execute load callbacks until all are complete.
-	private unsafe void ThreadMain()
-	{
-		while (PendingLoads.Count != LoadsCompleted)
-		{
-			if (LoadQueue.WaitResult(out var outcome, -1))
+    private unsafe void ThreadMain()
+    {
+        while (PendingLoads.Count != LoadsCompleted)
+        {
+            if (LoadQueue.WaitResult(out var outcome, -1))
 			{
 				if (outcome.Result == Result.Complete)
 				{
-					var loadData = PendingLoads[(int) outcome.UserData];
-					var span = new ReadOnlySpan<byte>((void*) outcome.Buffer, (int) outcome.BytesTransferred);
+					var loadData = PendingLoads[(int)outcome.UserData];
+					var span = new ReadOnlySpan<byte>((void*)outcome.Buffer, (int)outcome.BytesTransferred);
 
 					switch (loadData.LoadType)
 					{
 						case LoadType.CompressedImage:
-							{
-								LoadCompressedImage((Texture) loadData.Object, span);
-								break;
-							}
+						{
+							LoadCompressedImage((Texture) loadData.Object, span);
+							break;
+						}
 
 						case LoadType.AudioWav:
-							{
-								LoadWavData((AudioBuffer) loadData.Object, span);
-								break;
-							}
+						{
+							LoadWavData((AudioBuffer) loadData.Object, span);
+							break;
+						}
 
 						case LoadType.AudioOggStatic:
-							{
-								LoadOggStaticData((AudioBuffer) loadData.Object, span);
-								break;
-							}
+						{
+							LoadOggStaticData((AudioBuffer) loadData.Object, span);
+							break;
+						}
 
 						case LoadType.AudioOggStreaming:
-							{
-								LoadOggStreamingData((AudioDataOgg) loadData.Object, span);
-								break;
-							}
+						{
+							LoadOggStreamingData((AudioDataOgg) loadData.Object, span);
+							break;
+						}
 
 						case LoadType.AudioQoaStatic:
-							{
-								LoadQoaStaticData((AudioBuffer) loadData.Object, span);
-								break;
-							}
+						{
+							LoadQoaStaticData((AudioBuffer) loadData.Object, span);
+							break;
+						}
 
 						case LoadType.AudioQoaStreaming:
-							{
-								LoadQoaStreamingData((AudioDataQoa) loadData.Object, span);
-								break;
-							}
+						{
+							LoadQoaStreamingData((AudioDataQoa) loadData.Object, span);
+							break;
+						}
 
 						case LoadType.Custom:
-							{
-								PerformLoadCallback(loadData.Callback, loadData.Object, span);
-								break;
-							}
+						{
+							PerformLoadCallback(loadData.Callback, loadData.Object, span);
+							break;
+						}
 					}
 
 					SDL3.SDL.SDL_free(outcome.Buffer);
@@ -236,11 +236,11 @@ public class AsyncFileLoader : IDisposable
 					return;
 				}
 			}
-		}
+        }
 
 		Status = AsyncFileLoaderStatus.Complete;
 		Reset();
-	}
+    }
 
 	private void Reset()
 	{
@@ -292,26 +292,26 @@ public class AsyncFileLoader : IDisposable
 		callback(callbackObject, data);
 	}
 
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!IsDisposed)
-		{
-			if (disposing)
-			{
-				LoadQueue.Destroy();
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            if (disposing)
+            {
+                LoadQueue.Destroy();
 				ResourceUploader.Dispose();
-			}
+            }
 
-			IsDisposed = true;
-		}
-	}
+            IsDisposed = true;
+        }
+    }
 
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 }
 
 /// <summary>

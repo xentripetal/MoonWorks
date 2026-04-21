@@ -114,44 +114,44 @@ public class UserStorage : IDisposable
 		switch (command.Type)
 		{
 			case CommandType.GetSpaceRemaining:
-				{
-					command.ResultToken.Size = SDL.SDL_GetStorageSpaceRemaining(handle);
-					command.ResultToken.Result = Result.Success;
-					return;
-				}
+			{
+				command.ResultToken.Size = SDL.SDL_GetStorageSpaceRemaining(handle);
+				command.ResultToken.Result = Result.Success;
+				return;
+			}
 
 			case CommandType.GetFileSize:
-				{
-					// FIXME: Can SDL3-CS just take a byte* overload for strings to avoid this silly round trip?
-					var str = InteropUtilities.DecodeFromUTF8Buffer((byte*) command.WriteFileCommand.Path, command.WriteFileCommand.PathLength);
-					NativeMemory.Free((void*) command.GetFileSizeCommand.Path);
+			{
+				// FIXME: Can SDL3-CS just take a byte* overload for strings to avoid this silly round trip?
+				var str = InteropUtilities.DecodeFromUTF8Buffer((byte*) command.WriteFileCommand.Path, command.WriteFileCommand.PathLength);
+				NativeMemory.Free((void*) command.GetFileSizeCommand.Path);
 
-					var success = SDL.SDL_GetStorageFileSize(handle, str, out command.ResultToken.Size);
-					command.ResultToken.Result = success ? Result.Success : Result.Failure;
-					return;
-				}
+				var success = SDL.SDL_GetStorageFileSize(handle, str, out command.ResultToken.Size);
+				command.ResultToken.Result = success ? Result.Success : Result.Failure;
+				return;
+			}
 
 			case CommandType.ReadFile:
-				{
-					// FIXME: Can SDL3-CS just take a byte* overload for strings to avoid this silly round trip?
-					var str = InteropUtilities.DecodeFromUTF8Buffer((byte*) command.WriteFileCommand.Path, command.WriteFileCommand.PathLength);
-					NativeMemory.Free((void*) command.ReadFileCommand.Path);
+			{
+				// FIXME: Can SDL3-CS just take a byte* overload for strings to avoid this silly round trip?
+				var str = InteropUtilities.DecodeFromUTF8Buffer((byte*) command.WriteFileCommand.Path, command.WriteFileCommand.PathLength);
+				NativeMemory.Free((void*) command.ReadFileCommand.Path);
 
-					command.ResultToken.Buffer = ReadFile(handle, str, out command.ResultToken.Size);
-					command.ResultToken.Result = command.ResultToken.Buffer == IntPtr.Zero ? Result.Failure : Result.Success;
-					return;
-				}
+				command.ResultToken.Buffer = ReadFile(handle, str, out command.ResultToken.Size);
+				command.ResultToken.Result = command.ResultToken.Buffer == IntPtr.Zero ? Result.Failure : Result.Success;
+				return;
+			}
 
 			case CommandType.WriteFile:
-				{
-					// FIXME: Can SDL3-CS just take a byte* overload for strings to avoid this silly round trip?
-					var str = InteropUtilities.DecodeFromUTF8Buffer((byte*) command.WriteFileCommand.Path, command.WriteFileCommand.PathLength);
-					NativeMemory.Free((void*) command.WriteFileCommand.Path);
+			{
+				// FIXME: Can SDL3-CS just take a byte* overload for strings to avoid this silly round trip?
+				var str = InteropUtilities.DecodeFromUTF8Buffer((byte*) command.WriteFileCommand.Path, command.WriteFileCommand.PathLength);
+				NativeMemory.Free((void*) command.WriteFileCommand.Path);
 
-					var success = WriteFile(handle, str, command.WriteFileCommand.Buffer, command.WriteFileCommand.Size);
-					command.ResultToken.Result = success ? Result.Success : Result.Failure;
-					return;
-				}
+				var success = WriteFile(handle, str, command.WriteFileCommand.Buffer, command.WriteFileCommand.Size);
+				command.ResultToken.Result = success ? Result.Success : Result.Failure;
+				return;
+			}
 
 			default:
 				Logger.LogError("Unrecognized UserStorage command! This shouldn't happen!");
@@ -176,40 +176,40 @@ public class UserStorage : IDisposable
 		return true;
 	}
 
-	/// <summary>
-	/// Closes the storage container.
-	/// </summary>
-	private void Close(IntPtr handle)
-	{
-		if (!SDL.SDL_CloseStorage(handle))
-		{
-			Logger.LogError(SDL.SDL_GetError());
-		}
-	}
+    /// <summary>
+    /// Closes the storage container.
+    /// </summary>
+    private void Close(IntPtr handle)
+    {
+        if (!SDL.SDL_CloseStorage(handle))
+        {
+            Logger.LogError(SDL.SDL_GetError());
+        }
+    }
 
-	/// <summary>
-	/// Query the size of a file within a storage container.
-	/// </summary>
-	/// <param name="path">A path relative to the title root.</param>
-	/// <param name="size">Filled in with the size of the file.</param>
-	/// <returns>True if the query succeeded, false otherwise.</returns>
-	private static bool GetFileSize(IntPtr handle, string path, out ulong size)
-	{
-		if (!SDL.SDL_GetStorageFileSize(handle, path, out size))
-		{
-			Logger.LogError(SDL.SDL_GetError());
-			return false;
-		}
+    /// <summary>
+    /// Query the size of a file within a storage container.
+    /// </summary>
+    /// <param name="path">A path relative to the title root.</param>
+    /// <param name="size">Filled in with the size of the file.</param>
+    /// <returns>True if the query succeeded, false otherwise.</returns>
+    private static bool GetFileSize(IntPtr handle, string path, out ulong size)
+    {
+        if (!SDL.SDL_GetStorageFileSize(handle, path, out size))
+        {
+            Logger.LogError(SDL.SDL_GetError());
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 	/// <summary>
 	/// Synchronously read a file and return the contents in a ReadOnlySpan.
 	/// UserStorage will allocate the file memory for you.
 	/// You MUST call NativeMemory.Free when you are done with the memory.
 	/// </summary>
-	/// <param name="path">The relative path from the title root.</param>
+    /// <param name="path">The relative path from the title root.</param>
 	/// <param name="size">The size of the file in bytes.</param>
 	/// <returns>A buffer of the file size on success, null on failure.</returns>
 	private static unsafe IntPtr ReadFile(IntPtr handle, string path, out ulong size)
@@ -276,12 +276,12 @@ public class UserStorage : IDisposable
 
 	~UserStorage()
 	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-#if DEBUG
+	    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		#if DEBUG
 		Logger.LogWarn($"UserStorage was not Disposed!");
-#endif
+		#endif
 
-		Dispose(disposing: false);
+	    Dispose(disposing: false);
 	}
 
 	public void Dispose()

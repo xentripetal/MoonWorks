@@ -1,4 +1,4 @@
-namespace MoonWorks.Input
+﻿namespace MoonWorks.Input
 {
 	/// <summary>
 	/// Container for the current state of a binary input.
@@ -94,7 +94,7 @@ namespace MoonWorks.Input
 				{
 					return b;
 				}
-				else
+				else 
 				{
 					return a;
 				}

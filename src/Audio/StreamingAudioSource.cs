@@ -8,7 +8,7 @@ namespace MoonWorks.Audio;
 public abstract class StreamingAudioSource : AudioResource
 {
 	protected const int BUFFER_COUNT = 3;
-	public SourceVoice SendVoice { get; protected set; }
+	public SourceVoice SendVoice { get; protected set;}
 
 	/// <summary>
 	/// Indicates that all available audio data from the source has been consumed.
@@ -61,8 +61,7 @@ public abstract class StreamingAudioSource : AudioResource
 			SendVoice != null &&
 			!OutOfData &&
 			SendVoice.BuffersQueued < BUFFER_COUNT
-		)
-		{
+		) {
 			QueueBuffers();
 		}
 	}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using SDL = MoonWorks.Graphics.SDL_GPU;
 
@@ -18,8 +18,7 @@ public class GraphicsPipeline : SDLGPUResource
 	public static unsafe GraphicsPipeline Create(
 		GraphicsDevice device,
 		in GraphicsPipelineCreateInfo graphicsPipelineCreateInfo
-	)
-	{
+	) {
 		INTERNAL_GraphicsPipelineCreateInfo createInfo;
 
 		var vertexAttributes = (VertexAttribute*) NativeMemory.Alloc(

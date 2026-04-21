@@ -16,9 +16,9 @@ namespace MoonWorks.Input
 		}
 
 		internal void Update(bool wasPressed, bool isDown)
-		{
-			UpdateState(wasPressed);
+        {
+            UpdateState(wasPressed);
 			Down = isDown;
-		}
+        }
 	}
 }

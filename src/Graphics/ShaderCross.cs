@@ -51,8 +51,7 @@ public static class ShaderCross
 		string name = null,
 		string includeDir = null,       // Only used by HLSL
 		params Span<HLSLDefine> defines // Only used by HLSL
-	)
-	{
+	) {
 		name ??= System.IO.Path.GetFileName(filepath); // if name not provided, just use filename
 
 		Shader shader;
@@ -132,8 +131,7 @@ public static class ShaderCross
 		string name = null,
 		string includeDir = null,       // Only used for HLSL
 		params Span<HLSLDefine> defines // Only used by HLSL
-	)
-	{
+	) {
 		name ??= System.IO.Path.GetFileName(filepath); // if name not provided, just use filename
 
 		ComputePipeline pipeline;

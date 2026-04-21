@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using SDL = MoonWorks.Graphics.SDL_GPU;
 
@@ -11,7 +11,7 @@ public class Buffer : SDLGPUResource
 {
 	protected override Action<IntPtr, IntPtr> ReleaseFunction => SDL.SDL_ReleaseGPUBuffer;
 
-	public BufferUsageFlags UsageFlags { get; private init; }
+	public BufferUsageFlags UsageFlags { get; private init;  }
 
 	/// <summary>
 	/// Size in bytes.
@@ -68,8 +68,7 @@ public class Buffer : SDLGPUResource
 	public static Buffer Create(
 		GraphicsDevice device,
 		in BufferCreateInfo createInfo
-	)
-	{
+	) {
 		var handle = SDL.SDL_CreateGPUBuffer(device.Handle, createInfo);
 		if (handle == IntPtr.Zero)
 		{

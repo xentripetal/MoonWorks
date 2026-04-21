@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using SDL = MoonWorks.Graphics.SDL_GPU;
@@ -40,16 +40,14 @@ public class CommandBuffer
 	/// </summary>
 	public Texture AcquireSwapchainTexture(
 		Window window
-	)
-	{
+	) {
 		if (!SDL.SDL_AcquireGPUSwapchainTexture(
 			Handle,
 			window.Handle,
 			out var texturePtr,
 			out var width,
 			out var height
-		))
-		{
+		)) {
 			throw new System.InvalidOperationException(SDL3.SDL.SDL_GetError());
 		}
 
@@ -76,8 +74,7 @@ public class CommandBuffer
 		void* uniformsPtr,
 		uint size,
 		uint slot = 0
-	)
-	{
+	) {
 		SDL.SDL_PushGPUVertexUniformData(
 			Handle,
 			slot,
@@ -111,8 +108,7 @@ public class CommandBuffer
 		void* uniformsPtr,
 		uint size,
 		uint slot = 0
-	)
-	{
+	) {
 		SDL.SDL_PushGPUFragmentUniformData(
 			Handle,
 			slot,
@@ -146,8 +142,7 @@ public class CommandBuffer
 		void* uniformsPtr,
 		uint size,
 		uint slot = 0
-	)
-	{
+	) {
 		SDL.SDL_PushGPUComputeUniformData(
 			Handle,
 			slot,
@@ -180,8 +175,7 @@ public class CommandBuffer
 	/// <param name="colorTargetInfos">The color targets to use in the render pass.</param>
 	public unsafe RenderPass BeginRenderPass(
 		params Span<ColorTargetInfo> colorTargetInfos
-	)
-	{
+	) {
 		var renderPassHandle = SDL.SDL_BeginGPURenderPass(
 			Handle,
 			colorTargetInfos,
@@ -212,8 +206,7 @@ public class CommandBuffer
 	public unsafe RenderPass BeginRenderPass(
 		in DepthStencilTargetInfo depthStencilTargetInfo,
 		params Span<ColorTargetInfo> colorTargetInfos
-	)
-	{
+	) {
 		var renderPassHandle = SDL.SDL_BeginGPURenderPass(
 			Handle,
 			colorTargetInfos,
@@ -283,8 +276,7 @@ public class CommandBuffer
 	public ComputePass BeginComputePass(
 		Span<StorageTextureReadWriteBinding> readWriteTextureBindings,
 		Span<StorageBufferReadWriteBinding> readWriteBufferBindings
-	)
-	{
+	) {
 		var computePassHandle = SDL.SDL_BeginGPUComputePass(
 			Handle,
 			readWriteTextureBindings,
@@ -303,8 +295,7 @@ public class CommandBuffer
 	public ComputePass BeginComputePass(
 		in StorageTextureReadWriteBinding readWriteTextureBinding,
 		in StorageBufferReadWriteBinding readWriteBufferBinding
-	)
-	{
+	) {
 		var computePassHandle = SDL.SDL_BeginGPUComputePass(
 			Handle,
 			[readWriteTextureBinding],
@@ -322,8 +313,7 @@ public class CommandBuffer
 
 	public ComputePass BeginComputePass(
 		in StorageTextureReadWriteBinding readWriteTextureBinding
-	)
-	{
+	) {
 		var computePassHandle = SDL.SDL_BeginGPUComputePass(
 			Handle,
 			[readWriteTextureBinding],
@@ -341,8 +331,7 @@ public class CommandBuffer
 
 	public ComputePass BeginComputePass(
 		in StorageBufferReadWriteBinding readWriteBufferBinding
-	)
-	{
+	) {
 		var computePassHandle = SDL.SDL_BeginGPUComputePass(
 			Handle,
 			[],

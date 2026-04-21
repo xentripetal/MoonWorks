@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using SDL = MoonWorks.Graphics.SDL_GPU;
 
 namespace MoonWorks.Graphics
@@ -41,8 +41,7 @@ namespace MoonWorks.Graphics
 			TextureUsageFlags usageFlags,
 			uint levelCount = 1,
 			SampleCount sampleCount = SampleCount.One
-		)
-		{
+		) {
 			var props = SDL3.SDL.SDL_CreateProperties();
 			SDL3.SDL.SDL_SetStringProperty(props, SDL3.SDL.SDL_PROP_GPU_TEXTURE_CREATE_NAME_STRING, name);
 
@@ -105,8 +104,7 @@ namespace MoonWorks.Graphics
 			TextureFormat format,
 			TextureUsageFlags usageFlags,
 			uint levelCount = 1
-		)
-		{
+		) {
 			var props = SDL3.SDL.SDL_CreateProperties();
 			SDL3.SDL.SDL_SetStringProperty(props, SDL3.SDL.SDL_PROP_GPU_TEXTURE_CREATE_NAME_STRING, name);
 
@@ -162,8 +160,7 @@ namespace MoonWorks.Graphics
 			TextureFormat format,
 			TextureUsageFlags usageFlags,
 			uint levelCount = 1
-		)
-		{
+		) {
 			var props = SDL3.SDL.SDL_CreateProperties();
 			SDL3.SDL.SDL_SetStringProperty(props, SDL3.SDL.SDL_PROP_GPU_TEXTURE_CREATE_NAME_STRING, name);
 
@@ -216,8 +213,7 @@ namespace MoonWorks.Graphics
 			TextureFormat format,
 			TextureUsageFlags usageFlags,
 			uint levelCount = 1
-		)
-		{
+		) {
 			var props = SDL3.SDL.SDL_CreateProperties();
 			SDL3.SDL.SDL_SetStringProperty(props, SDL3.SDL.SDL_PROP_GPU_TEXTURE_CREATE_NAME_STRING, name);
 
@@ -264,8 +260,7 @@ namespace MoonWorks.Graphics
 			TextureUsageFlags usageFlags,
 			uint arrayCount,
 			uint levelCount = 1
-		)
-		{
+		) {
 			var props = SDL3.SDL.SDL_CreateProperties();
 			SDL3.SDL.SDL_SetStringProperty(props, SDL3.SDL.SDL_PROP_GPU_TEXTURE_CREATE_NAME_STRING, name);
 
@@ -300,8 +295,7 @@ namespace MoonWorks.Graphics
 		public static Texture Create(
 			GraphicsDevice device,
 			in TextureCreateInfo createInfo
-		)
-		{
+		) {
 			var handle = SDL.SDL_CreateGPUTexture(device.Handle, createInfo);
 
 			if (handle == IntPtr.Zero)

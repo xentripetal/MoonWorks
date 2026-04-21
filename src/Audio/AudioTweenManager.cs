@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MoonWorks.Audio
@@ -71,8 +71,7 @@ namespace MoonWorks.Audio
 			float end,
 			float duration,
 			float delayTime
-		)
-		{
+		) {
 			var tween = AudioTweenPool.Obtain();
 			tween.Voice = voice;
 			tween.Property = property;
@@ -100,8 +99,7 @@ namespace MoonWorks.Audio
 
 		private void AddTween(
 			AudioTween audioTween
-		)
-		{
+		) {
 			// if a tween with the same sound and property already exists, get rid of it
 			if (AudioTweens.TryGetValue((audioTween.Voice, audioTween.Property), out var currentTween))
 			{
