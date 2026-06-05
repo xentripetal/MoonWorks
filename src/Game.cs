@@ -148,8 +148,24 @@ namespace MoonWorks
 		/// </summary>
 		public void Run()
 		{
-			MainWindow.Show();
-			SDL.SDL_RaiseWindow(MainWindow.Handle);
+			if (MainWindow.StartMinimized)
+			{
+				// Tell SDL not to activate (focus/raise to front) the app when the
+				// window is shown. SDL_WINDOW_NOT_FOCUSABLE blocks keyboard focus but
+				// on some platforms (macOS) showing/raising still brings the app
+				// forward; these hints suppress that so a background window stays out
+				// of the way. The window was created with SDL_WINDOW_MINIMIZED, so
+				// Show() reveals it already minimized — no full-size flash — and we
+				// skip the raise entirely.
+				SDL.SDL_SetHint(SDL.SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "0");
+				SDL.SDL_SetHint(SDL.SDL_HINT_WINDOW_ACTIVATE_WHEN_RAISED, "0");
+				MainWindow.Show();
+			}
+			else
+			{
+				MainWindow.Show();
+				SDL.SDL_RaiseWindow(MainWindow.Handle);
+			}
 
 			Initialized = true;
 

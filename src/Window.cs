@@ -16,6 +16,12 @@ namespace MoonWorks
 		public ScreenMode ScreenMode { get; private set; }
 		public uint Width { get; private set; }
 		public uint Height { get; private set; }
+
+		/// <summary>
+		/// Whether this window was created to open minimized. Game.Run() consults this
+		/// to show the window minimized and skip the startup raise.
+		/// </summary>
+		public bool StartMinimized { get; private set; }
 		internal Texture SwapchainTexture { get; set; }
 
 		public bool Claimed { get; internal set; }
@@ -82,7 +88,18 @@ namespace MoonWorks
 				flags |= SDL.SDL_WindowFlags.SDL_WINDOW_HIGH_PIXEL_DENSITY;
 			}
 
+			if (windowCreateInfo.StartMinimized)
+			{
+				flags |= SDL.SDL_WindowFlags.SDL_WINDOW_MINIMIZED;
+			}
+
+			if (windowCreateInfo.NotFocusable)
+			{
+				flags |= SDL.SDL_WindowFlags.SDL_WINDOW_NOT_FOCUSABLE;
+			}
+
 			ScreenMode = windowCreateInfo.ScreenMode;
+			StartMinimized = windowCreateInfo.StartMinimized;
 
 			var displayID = SDL.SDL_GetPrimaryDisplay();
 			SDL.SDL_DisplayMode *displayMode = (SDL.SDL_DisplayMode*) SDL.SDL_GetCurrentDisplayMode(displayID);
