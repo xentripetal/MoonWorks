@@ -34,6 +34,19 @@
 		/// If the system does not support high DPI, this will have no effect.
 		/// </summary>
 		public bool HighDPI;
+		/// <summary>
+		/// Specifies that the window should open minimized rather than shown at full
+		/// size. Run() shows the window minimized and skips the startup raise, so it
+		/// never appears on screen or comes to the foreground. Useful for background /
+		/// automated sessions that shouldn't grab the user's attention.
+		/// </summary>
+		public bool StartMinimized;
+		/// <summary>
+		/// Specifies that the window should not take input focus. Combined with
+		/// StartMinimized this keeps a background session from stealing focus from
+		/// whatever spawned it.
+		/// </summary>
+		public bool NotFocusable;
 
 		public WindowCreateInfo(
 			string windowTitle,
@@ -42,7 +55,9 @@
 			ScreenMode screenMode,
 			bool systemResizable = false,
 			bool startMaximized = false,
-			bool highDPI = false
+			bool highDPI = false,
+			bool startMinimized = false,
+			bool notFocusable = false
 		)
 		{
 			WindowTitle = windowTitle;
@@ -52,6 +67,8 @@
 			SystemResizable = systemResizable;
 			StartMaximized = startMaximized;
 			HighDPI = highDPI;
+			StartMinimized = startMinimized;
+			NotFocusable = notFocusable;
 		}
 	}
 }
