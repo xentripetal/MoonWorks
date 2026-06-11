@@ -10,8 +10,23 @@ public abstract class SDLGPUResource : GraphicsResource
 
 	protected abstract Action<IntPtr, IntPtr> ReleaseFunction { get; }
 
+	// Resident-memory accounting: set by the creating subtype, subtracted on dispose.
+	private GpuResourceKind statKind;
+	private long statBytes;
+
 	protected SDLGPUResource(GraphicsDevice device) : base(device)
 	{
+	}
+
+	/// <summary>
+	/// Registers this resource's resident size with the device statistics. Called by the
+	/// creating subtype once its size is known; the amount is automatically subtracted on dispose.
+	/// </summary>
+	internal void TrackMemory(GpuResourceKind kind, long bytes)
+	{
+		statKind = kind;
+		statBytes = bytes;
+		Device.Statistics.TrackResource(kind, bytes);
 	}
 
 	public static implicit operator IntPtr(SDLGPUResource resource)
@@ -23,6 +38,12 @@ public abstract class SDLGPUResource : GraphicsResource
 	{
 		if (!IsDisposed)
 		{
+			if (statBytes != 0)
+			{
+				Device.Statistics.UntrackResource(statKind, statBytes);
+				statBytes = 0;
+			}
+
 			// Atomically call release function in case this is called from the finalizer thread
 			var toDispose = Interlocked.Exchange(ref handle, IntPtr.Zero);
 			if (toDispose != IntPtr.Zero)

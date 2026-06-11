@@ -77,6 +77,7 @@ public class CopyPass
 			destination,
 			cycle
 		);
+		CommandBuffer.Device.Statistics.RecordUpload(destination.Size, CommandBuffer.CurrentGroupCounters);
 	}
 
 	/// <summary>

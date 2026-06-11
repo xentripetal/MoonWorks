@@ -77,12 +77,14 @@ public class TransferBuffer : SDLGPUResource
 			Logger.LogError(SDL3.SDL.SDL_GetError());
 			return null;
 		}
-		return new TransferBuffer(device)
+		var transferBuffer = new TransferBuffer(device)
 		{
 			Handle = handle,
 			Size = createInfo.Size,
 			Name = SDL3.SDL.SDL_GetStringProperty(createInfo.Props, SDL3.SDL.SDL_PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING, "TransferBuffer")
 		};
+		transferBuffer.TrackMemory(GpuResourceKind.TransferBuffer, createInfo.Size);
+		return transferBuffer;
 	}
 
 	private TransferBuffer(GraphicsDevice device) : base(device) { }

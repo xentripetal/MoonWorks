@@ -304,7 +304,7 @@ namespace MoonWorks.Graphics
 				return null;
 			}
 
-			return new Texture(device)
+			var texture = new Texture(device)
 			{
 				Handle = handle,
 				Type = createInfo.Type,
@@ -318,6 +318,8 @@ namespace MoonWorks.Graphics
 				Size = CalculateSize(createInfo.Format, createInfo.Width, createInfo.Height, createInfo.LayerCountOrDepth),
 				Name = SDL3.SDL.SDL_GetStringProperty(createInfo.Props, SDL3.SDL.SDL_PROP_GPU_TEXTURE_CREATE_NAME_STRING, "Texture")
 			};
+			texture.TrackMemory(GpuResourceKind.Texture, texture.Size);
+			return texture;
 		}
 
 		private Texture(GraphicsDevice device) : base(device) { }

@@ -16,6 +16,15 @@ public class CommandBuffer
 	public GraphicsDevice Device { get; }
 	public IntPtr Handle { get; internal set; }
 
+	// Active debug-group stack, used to attribute render statistics to the innermost group.
+	private readonly System.Collections.Generic.Stack<string> debugGroups = new();
+
+	/// <summary>
+	/// Statistics bucket for the innermost active debug group, or null when no group is active.
+	/// Read by RenderPass/CopyPass to attribute draws and uploads to the current group.
+	/// </summary>
+	internal GraphicsStatistics.Counters CurrentGroupCounters { get; private set; }
+
 	// called from CommandBufferPool
 	internal CommandBuffer(GraphicsDevice device)
 	{
@@ -26,6 +35,9 @@ public class CommandBuffer
 	internal void SetHandle(nint handle)
 	{
 		Handle = handle;
+		// Command buffers are pooled; clear any group state left over from a prior use.
+		debugGroups.Clear();
+		CurrentGroupCounters = null;
 	}
 
 	/// <summary>
@@ -192,6 +204,7 @@ public class CommandBuffer
 		var renderPass = Device.RenderPassPool.Obtain();
 		renderPass.Handle = renderPassHandle;
 		renderPass.CommandBuffer = this;
+		Device.Statistics.RecordRenderPass(CurrentGroupCounters);
 
 		return renderPass;
 	}
@@ -223,6 +236,7 @@ public class CommandBuffer
 		var renderPass = Device.RenderPassPool.Obtain();
 		renderPass.Handle = renderPassHandle;
 		renderPass.CommandBuffer = this;
+		Device.Statistics.RecordRenderPass(CurrentGroupCounters);
 
 		return renderPass;
 	}
@@ -288,6 +302,7 @@ public class CommandBuffer
 		var computePass = Device.ComputePassPool.Obtain();
 		computePass.Handle = computePassHandle;
 		computePass.CommandBuffer = this;
+		Device.Statistics.RecordComputePass(CurrentGroupCounters);
 
 		return computePass;
 	}
@@ -307,6 +322,7 @@ public class CommandBuffer
 		var computePass = Device.ComputePassPool.Obtain();
 		computePass.Handle = computePassHandle;
 		computePass.CommandBuffer = this;
+		Device.Statistics.RecordComputePass(CurrentGroupCounters);
 
 		return computePass;
 	}
@@ -325,6 +341,7 @@ public class CommandBuffer
 		var computePass = Device.ComputePassPool.Obtain();
 		computePass.Handle = computePassHandle;
 		computePass.CommandBuffer = this;
+		Device.Statistics.RecordComputePass(CurrentGroupCounters);
 
 		return computePass;
 	}
@@ -343,6 +360,7 @@ public class CommandBuffer
 		var computePass = Device.ComputePassPool.Obtain();
 		computePass.Handle = computePassHandle;
 		computePass.CommandBuffer = this;
+		Device.Statistics.RecordComputePass(CurrentGroupCounters);
 
 		return computePass;
 	}
@@ -372,6 +390,7 @@ public class CommandBuffer
 		var copyPass = Device.CopyPassPool.Obtain();
 		copyPass.Handle = copyPassHandle;
 		copyPass.CommandBuffer = this;
+		Device.Statistics.RecordCopyPass(CurrentGroupCounters);
 
 		return copyPass;
 	}
@@ -394,10 +413,19 @@ public class CommandBuffer
 	public void PushDebugGroup(string name)
 	{
 		SDL.SDL_PushGPUDebugGroup(Handle, name);
+		debugGroups.Push(name);
+		CurrentGroupCounters = Device.Statistics.GroupCounters(name);
 	}
 
 	public void PopDebugGroup()
 	{
 		SDL.SDL_PopGPUDebugGroup(Handle);
+		if (debugGroups.Count > 0)
+		{
+			debugGroups.Pop();
+		}
+		CurrentGroupCounters = debugGroups.Count > 0
+			? Device.Statistics.GroupCounters(debugGroups.Peek())
+			: null;
 	}
 }

@@ -37,6 +37,12 @@ public class GraphicsDevice : IDisposable
 
 	public bool IsDisposed { get; private set; }
 
+	/// <summary>
+	/// Automatic per-frame render statistics (draw calls, passes, triangles, …) and resident
+	/// GPU-memory accounting. Call <see cref="GraphicsStatistics.BeginFrame"/> once per frame.
+	/// </summary>
+	public GraphicsStatistics Statistics { get; } = new GraphicsStatistics();
+
 	private readonly HashSet<GCHandle> resources = new HashSet<GCHandle>();
 	private CommandBufferPool CommandBufferPool;
 	private FencePool FencePool;

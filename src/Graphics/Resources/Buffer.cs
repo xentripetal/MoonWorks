@@ -75,13 +75,15 @@ public class Buffer : SDLGPUResource
 			Logger.LogError(SDL3.SDL.SDL_GetError());
 			return null;
 		}
-		return new Buffer(device)
+		var buffer = new Buffer(device)
 		{
 			Handle = handle,
 			Size = createInfo.Size,
 			UsageFlags = createInfo.Usage,
 			Name = SDL3.SDL.SDL_GetStringProperty(createInfo.Props, SDL3.SDL.SDL_PROP_GPU_BUFFER_CREATE_NAME_STRING, "Buffer")
 		};
+		buffer.TrackMemory(GpuResourceKind.Buffer, createInfo.Size);
+		return buffer;
 	}
 
 	private Buffer(GraphicsDevice device) : base(device) { }

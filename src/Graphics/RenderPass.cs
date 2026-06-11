@@ -206,6 +206,7 @@ public class RenderPass
 			textureSamplerBindings,
 			(uint) textureSamplerBindings.Length
 		);
+		CommandBuffer.Device.Statistics.RecordTextureBinds(textureSamplerBindings.Length, CommandBuffer.CurrentGroupCounters);
 	}
 
 	/// <summary>
@@ -290,6 +291,7 @@ public class RenderPass
 			vertexOffset,
 			firstInstance
 		);
+		CommandBuffer.Device.Statistics.RecordDrawCall((long) (indexCount / 3) * instanceCount, CommandBuffer.CurrentGroupCounters);
 	}
 
 	/// <summary>
@@ -309,6 +311,7 @@ public class RenderPass
 			firstVertex,
 			firstInstance
 		);
+		CommandBuffer.Device.Statistics.RecordDrawCall((long) (vertexCount / 3) * instanceCount, CommandBuffer.CurrentGroupCounters);
 	}
 
 	/// <summary>
@@ -329,6 +332,11 @@ public class RenderPass
 			offsetInBytes,
 			drawCount
 		);
+		// Triangle count is unknown for indirect draws (parameters live on the GPU).
+		for (uint i = 0; i < drawCount; i += 1)
+		{
+			CommandBuffer.Device.Statistics.RecordDrawCall(0, CommandBuffer.CurrentGroupCounters);
+		}
 	}
 
 	/// <summary>
@@ -349,5 +357,10 @@ public class RenderPass
 			offsetInBytes,
 			drawCount
 		);
+		// Triangle count is unknown for indirect draws (parameters live on the GPU).
+		for (uint i = 0; i < drawCount; i += 1)
+		{
+			CommandBuffer.Device.Statistics.RecordDrawCall(0, CommandBuffer.CurrentGroupCounters);
+		}
 	}
 }
