@@ -27,12 +27,11 @@ public enum GpuResourceKind
 /// GPU frame captures (RenderDoc, Xcode).
 /// </summary>
 /// <remarks>
-/// <b>Two surfaces, one for each side of a thread boundary.</b> The live counters are mutated on the
-/// hot recording path and are therefore unsynchronized and internal: only the thread recording
-/// commands may touch them. Everyone else — an overlay, a stats CLI, anything on another thread —
-/// reads <see cref="LastFrame"/>, an immutable snapshot the recording thread publishes at
-/// <see cref="BeginFrame"/>. Publishing rather than locking is what keeps the recording path free of
-/// synchronization while still giving a reader a value that is internally consistent: it is one
+/// <b>Two surfaces, one for each side of a thread boundary.</b> The live counters are internal and
+/// accumulate with interlocked adds, because a pipelined application records on more than one thread.
+/// Everyone else — an overlay, a stats CLI, anything that wants to display a number — reads
+/// <see cref="LastFrame"/>, an immutable snapshot published at <see cref="BeginFrame"/>. Publishing
+/// rather than locking is what gives a reader a value that is internally consistent: it is one
 /// finished frame, never a half-updated one.
 /// <para>
 /// The group map is a <see cref="ConcurrentDictionary{TKey, TValue}"/> even so. Entries are created
@@ -51,8 +50,20 @@ public sealed class GraphicsStatistics
 {
 	/// <summary>A bucket of live per-frame counters (frame total, or one debug group).</summary>
 	/// <remarks>
-	/// Written on the recording path with no synchronization. Read it only from the thread that is
-	/// recording; every other reader wants <see cref="LastFrame"/>.
+	/// Accumulated with interlocked adds, because <em>recording</em> is not one thread once rendering is
+	/// pipelined: the render frame is recorded on one thread and the present step — the swapchain blit
+	/// and whatever overlay rides on top of it — on another. Both go through the same counters. Plain
+	/// <c>++</c> across two threads loses increments silently, and a lost increment in a statistics
+	/// overlay reads as "the renderer did less work", which is exactly the wrong thing for a number
+	/// people tune against. The cost is one interlocked add per recorded call, which is nothing beside
+	/// the call it is counting.
+	/// <para>
+	/// What interlocking does <em>not</em> buy is frame attribution. <see cref="BeginFrame"/> closes a
+	/// frame from wherever it is called, and work another thread records either side of that instant
+	/// lands in whichever frame was open — so a pipelined present step's counts may be attributed one
+	/// frame off. That is inherent to counting two threads' work under one frame boundary, and it is
+	/// why the read surface is a published snapshot rather than a live total.
+	/// </para>
 	/// </remarks>
 	internal sealed class Counters
 	{
@@ -78,17 +89,25 @@ public sealed class GraphicsStatistics
 		public long UploadBytes;
 
 		internal FrameCounters ToValue() =>
-			new(DrawCalls, RenderPasses, ComputePasses, CopyPasses, Triangles, TextureBinds, UploadBytes);
+			new(
+				Interlocked.Read(ref DrawCalls),
+				Interlocked.Read(ref RenderPasses),
+				Interlocked.Read(ref ComputePasses),
+				Interlocked.Read(ref CopyPasses),
+				Interlocked.Read(ref Triangles),
+				Interlocked.Read(ref TextureBinds),
+				Interlocked.Read(ref UploadBytes)
+			);
 
 		internal void Reset()
 		{
-			DrawCalls = 0;
-			RenderPasses = 0;
-			ComputePasses = 0;
-			CopyPasses = 0;
-			Triangles = 0;
-			TextureBinds = 0;
-			UploadBytes = 0;
+			Interlocked.Exchange(ref DrawCalls, 0);
+			Interlocked.Exchange(ref RenderPasses, 0);
+			Interlocked.Exchange(ref ComputePasses, 0);
+			Interlocked.Exchange(ref CopyPasses, 0);
+			Interlocked.Exchange(ref Triangles, 0);
+			Interlocked.Exchange(ref TextureBinds, 0);
+			Interlocked.Exchange(ref UploadBytes, 0);
 		}
 	}
 
@@ -125,7 +144,7 @@ public sealed class GraphicsStatistics
 		public static readonly FrameSnapshot Empty = new(default, new Dictionary<string, FrameCounters>());
 	}
 
-	/// <summary>Live frame totals. Recording thread only.</summary>
+	/// <summary>Live frame totals. Accumulated by every recording thread; read via <see cref="LastFrame"/>.</summary>
 	internal Counters Total { get; } = new();
 
 	private readonly ConcurrentDictionary<string, Counters> groups = new();
@@ -142,57 +161,63 @@ public sealed class GraphicsStatistics
 	/// <summary>Returns the counters bucket for a debug-group name, creating it on first use.</summary>
 	internal Counters GroupCounters(string name) => groups.GetOrAdd(name, static _ => new Counters());
 
-	// ---- recording (the thread recording commands) ----
+	// ---- recording (any recording thread) ----
 
 	internal void RecordDrawCall(long triangles, Counters group)
 	{
-		Total.DrawCalls++;
-		Total.Triangles += triangles;
+		Interlocked.Increment(ref Total.DrawCalls);
+		Interlocked.Add(ref Total.Triangles, triangles);
 		if (group != null)
 		{
-			group.DrawCalls++;
-			group.Triangles += triangles;
+			Interlocked.Increment(ref group.DrawCalls);
+			Interlocked.Add(ref group.Triangles, triangles);
 		}
 	}
 
 	internal void RecordRenderPass(Counters group)
 	{
-		Total.RenderPasses++;
-		if (group != null) group.RenderPasses++;
+		Interlocked.Increment(ref Total.RenderPasses);
+		if (group != null) Interlocked.Increment(ref group.RenderPasses);
 	}
 
 	internal void RecordComputePass(Counters group)
 	{
-		Total.ComputePasses++;
-		if (group != null) group.ComputePasses++;
+		Interlocked.Increment(ref Total.ComputePasses);
+		if (group != null) Interlocked.Increment(ref group.ComputePasses);
 	}
 
 	internal void RecordCopyPass(Counters group)
 	{
-		Total.CopyPasses++;
-		if (group != null) group.CopyPasses++;
+		Interlocked.Increment(ref Total.CopyPasses);
+		if (group != null) Interlocked.Increment(ref group.CopyPasses);
 	}
 
 	internal void RecordTextureBinds(long count, Counters group)
 	{
-		Total.TextureBinds += count;
-		if (group != null) group.TextureBinds += count;
+		Interlocked.Add(ref Total.TextureBinds, count);
+		if (group != null) Interlocked.Add(ref group.TextureBinds, count);
 	}
 
 	internal void RecordUpload(long bytes, Counters group)
 	{
-		Total.UploadBytes += bytes;
-		if (group != null) group.UploadBytes += bytes;
+		Interlocked.Add(ref Total.UploadBytes, bytes);
+		if (group != null) Interlocked.Add(ref group.UploadBytes, bytes);
 	}
 
 	/// <summary>
 	/// Publishes the frame that just ended into <see cref="LastFrame"/> and resets every live
-	/// counter. Call once per frame, from the thread that records commands — publishing is the point
-	/// at which the counters stop being mutable and become readable elsewhere.
+	/// counter. Call once per frame, at a point in the frame that is the same every frame — publishing
+	/// is what makes the counters readable elsewhere.
 	/// </summary>
 	/// <remarks>
 	/// Group entries persist across frames (reset, not removed) so a UI can show stable rows; a group
 	/// that issued no work shows zeros.
+	/// <para>
+	/// Where to call it when more than one thread records: at a point where the others are idle, so a
+	/// frame boundary means the same thing to all of them. A pipelined renderer has exactly one such
+	/// point per frame — the hand-off — and calling it anywhere else attributes the other thread's work
+	/// to whichever frame happened to be open.
+	/// </para>
 	/// </remarks>
 	public void BeginFrame()
 	{

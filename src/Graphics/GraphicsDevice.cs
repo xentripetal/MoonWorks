@@ -50,6 +50,22 @@ public class GraphicsDevice : IDisposable
 	/// </summary>
 	public DeferredReleaseQueue DeferredReleases { get; } = new DeferredReleaseQueue();
 
+	/// <summary>
+	/// Whether <see cref="Game"/>'s loop drains <see cref="DeferredReleases"/> for you, at the head of
+	/// each tick. True by default, which is right for an application that records commands on the loop
+	/// thread and nowhere else.
+	/// </summary>
+	/// <remarks>
+	/// The head of the tick is a safe drain point because of what it is: the previous frame's command
+	/// buffer is submitted and this frame's has not been acquired, so the loop thread is provably not
+	/// mid-record. That reasoning is about <em>one</em> recording thread. An application that records on
+	/// a second thread — a pipelined renderer, say — has no such moment in the loop, and must set this
+	/// false and call <see cref="DrainDeferredReleases"/> itself at a point it knows every recording
+	/// thread is idle. Leaving it true there would release handles concurrently with the other thread's
+	/// recording, which is the race the queue was built to remove.
+	/// </remarks>
+	public bool AutoDrainDeferredReleases { get; set; } = true;
+
 	private readonly HashSet<GCHandle> resources = new HashSet<GCHandle>();
 	private CommandBufferPool CommandBufferPool;
 	private FencePool FencePool;

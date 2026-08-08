@@ -326,7 +326,14 @@ namespace MoonWorks
 			// Here rather than anywhere else because it is the one moment in the loop that is
 			// provably not inside command recording: the previous frame's buffer is submitted and
 			// this frame's has not been acquired. See DeferredReleaseQueue.
-			GraphicsDevice.DrainDeferredReleases();
+			//
+			// "Provably not inside command recording" is a statement about one recording thread. An
+			// application that records on a second thread turns this point off and drains at a moment
+			// it knows every recording thread is idle — see AutoDrainDeferredReleases.
+			if (GraphicsDevice.AutoDrainDeferredReleases)
+			{
+				GraphicsDevice.DrainDeferredReleases();
+			}
 
 			// Now that we are going to perform an update, let's handle SDL events.
 			// We'll process the system events immediately, and the input events before updating.
