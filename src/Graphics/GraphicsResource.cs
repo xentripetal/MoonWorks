@@ -20,6 +20,16 @@ public abstract class GraphicsResource : IDisposable
 		Device.AddResourceReference(SelfReference);
 	}
 
+	/// <summary>
+	/// Releases this resource.
+	/// </summary>
+	/// <param name="disposing">
+	/// True on the deterministic path — someone called <see cref="Dispose()"/> on a thread that owns
+	/// the device. False on the finalizer path, where the calling thread owns nothing and no native
+	/// handle may be touched. Subtypes holding a native handle must respect the distinction; the
+	/// sanctioned way is <see cref="DeferredReleaseQueue.ReleaseOrDefer"/>, which
+	/// <see cref="SDLGPUResource"/> already funnels through.
+	/// </param>
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!IsDisposed)
@@ -34,13 +44,24 @@ public abstract class GraphicsResource : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Leak detector, not a cleanup path.
+	/// </summary>
+	/// <remarks>
+	/// The finalizer runs on the GC's own thread, concurrently with whatever the thread that owns the
+	/// device is doing. Releasing a GPU handle from here is therefore a race with command recording
+	/// and submission — latent even in a single-threaded renderer, because the GC thread is a second
+	/// thread whether or not the application has one. So the finalizer's whole job is to say a
+	/// resource was leaked and hand its handle to the deferred-release queue, which the owning thread
+	/// drains at a defined point in the frame. Disposing properly suppresses the finalizer entirely
+	/// and none of this happens.
+	/// </remarks>
 	~GraphicsResource()
 	{
-		#if DEBUG
 		// If you see this log message, you leaked a graphics resource without disposing it!
-		// We'll try to clean it up for you but you really should fix this.
+		// The handle is released later, on the thread that owns the device — but you really should
+		// fix this, because until then the resource stays resident.
 		Logger.LogWarn($"A resource named {Name} of type {GetType().Name} was not Disposed.");
-		#endif
 
 		Dispose(false);
 	}

@@ -34,6 +34,14 @@ public abstract class SDLGPUResource : GraphicsResource
 		return resource.Handle;
 	}
 
+	/// <inheritdoc />
+	/// <remarks>
+	/// The release is inline only on the deterministic path. On the finalizer path the handle goes to
+	/// <see cref="GraphicsDevice.DeferredReleases"/> instead, because the GC thread owns neither the
+	/// device nor any ordering against the thread that is recording commands — see
+	/// <see cref="DeferredReleaseQueue"/>. The handle is exchanged out atomically either way, so a
+	/// racing <c>Dispose()</c> and finalizer cannot both hand the same handle onward.
+	/// </remarks>
 	protected override void Dispose(bool disposing)
 	{
 		if (!IsDisposed)
@@ -44,12 +52,13 @@ public abstract class SDLGPUResource : GraphicsResource
 				statBytes = 0;
 			}
 
-			// Atomically call release function in case this is called from the finalizer thread
 			var toDispose = Interlocked.Exchange(ref handle, IntPtr.Zero);
-			if (toDispose != IntPtr.Zero)
-			{
-				ReleaseFunction(Device.Handle, toDispose);
-			}
+			Device.DeferredReleases.ReleaseOrDefer(
+				Device.Handle,
+				toDispose,
+				ReleaseFunction,
+				inline: disposing
+			);
 		}
 		base.Dispose(disposing);
 	}

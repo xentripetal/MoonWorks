@@ -39,11 +39,6 @@ namespace MoonWorks
 		readonly Queue<SDL.SDL_Event> InputEventQueue = [];
 		readonly Queue<SDL.SDL_Event> SystemEventQueue = [];
 
-		// For handling WINDOW_EXPOSED on Windows
-		// This prevents stalling on window drag
-		readonly SDL.SDL_EventFilter EventFilter;
-		bool Initialized = false;
-
 		public GraphicsDevice GraphicsDevice { get; }
 		public AudioDevice AudioDevice { get; }
 		public VideoDevice VideoDevice { get; }
@@ -135,12 +130,22 @@ namespace MoonWorks
 			GatherSDLEvents();
 			ProcessSystemEvents();
 
-			// Set up WINDOW_EXPOSED handling to prevent stalling on window drag
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				EventFilter = new SDL.SDL_EventFilter(OnEventFilter);
-				SDL.SDL_SetEventFilter(EventFilter, nint.Zero);
-			}
+			// No SDL event filter is installed.
+			//
+			// There used to be one, on Windows only: SDL_EVENT_WINDOW_EXPOSED ran a full Tick(false)
+			// from inside SDL_PollEvent so that the window kept repainting during the modal
+			// move/resize loop, which otherwise blocks the message pump for as long as the user
+			// holds the mouse down. That is a re-entrant frame — a second update and a second draw
+			// nested inside the first — and it is unsound the moment drawing is not confined to one
+			// thread: the callback fires on whichever thread happens to be pumping events and would
+			// record a frame beside the one already in flight. It is removed rather than made
+			// conditional, because a re-entrant tick that only happens on one platform is a race
+			// that only fails on one platform.
+			//
+			// The cost is a real, accepted regression on Windows: a window being dragged or resized
+			// shows stale contents until the drag ends. Nothing repaints it, because there is no way
+			// to repaint from inside the pump without the re-entrancy this removes. Restoring live
+			// resize means driving the frame from somewhere that is not the modal loop.
 		}
 
 		/// <summary>
@@ -167,11 +172,9 @@ namespace MoonWorks
 				SDL.SDL_RaiseWindow(MainWindow.Handle);
 			}
 
-			Initialized = true;
-
 			while (!QuitRequested)
 			{
-				Tick(true);
+				Tick();
 			}
 
 			Logger.LogInfo("Starting shutdown sequence...");
@@ -288,47 +291,47 @@ namespace MoonWorks
 		/// </summary>
 		protected virtual bool OnSDLEvent(ref SDL.SDL_Event evt) => false;
 
-		private void Tick(bool processEvents)
+		private void Tick()
 		{
 			AdvanceElapsedTime();
 
-			if (processEvents)
+			if (FramePacingSettings.Mode != FramePacingMode.Uncapped)
 			{
-				if (FramePacingSettings.Mode != FramePacingMode.Uncapped)
+				// We want to wait until the framerate cap,
+				// but we don't want to oversleep. Requesting repeated 1ms sleeps and
+				// seeing how long we actually slept for lets us estimate the worst case
+				// sleep precision so we don't oversleep the next frame.
+				while (AccumulatedUpdateTime + WorstCaseSleepPrecision <  FramePacingSettings.Timestep)
 				{
-					// We want to wait until the framerate cap,
-					// but we don't want to oversleep. Requesting repeated 1ms sleeps and
-					// seeing how long we actually slept for lets us estimate the worst case
-					// sleep precision so we don't oversleep the next frame.
-					while (AccumulatedUpdateTime + WorstCaseSleepPrecision <  FramePacingSettings.Timestep)
-					{
-						System.Threading.Thread.Sleep(1);
-						TimeSpan timeAdvancedSinceSleeping = AdvanceElapsedTime();
-						UpdateEstimatedSleepPrecision(timeAdvancedSinceSleeping);
-					}
+					System.Threading.Thread.Sleep(1);
+					TimeSpan timeAdvancedSinceSleeping = AdvanceElapsedTime();
+					UpdateEstimatedSleepPrecision(timeAdvancedSinceSleeping);
+				}
 
-					// Now that we have slept into the sleep precision threshold, we need to wait
-					// for just a little bit longer until the target elapsed time has been reached.
-					// SpinWait(1) works by pausing the thread for very short intervals, so it is
-					// an efficient and time-accurate way to wait out the rest of the time.
-					while (AccumulatedUpdateTime < FramePacingSettings.Timestep)
-					{
-						System.Threading.Thread.SpinWait(1);
-						AdvanceElapsedTime();
-					}
+				// Now that we have slept into the sleep precision threshold, we need to wait
+				// for just a little bit longer until the target elapsed time has been reached.
+				// SpinWait(1) works by pausing the thread for very short intervals, so it is
+				// an efficient and time-accurate way to wait out the rest of the time.
+				while (AccumulatedUpdateTime < FramePacingSettings.Timestep)
+				{
+					System.Threading.Thread.SpinWait(1);
+					AdvanceElapsedTime();
 				}
 			}
 
 			// Wait for the swapchain before event processing to minimize input latency.
 			GraphicsDevice.WaitForSwapchain(MainWindow);
 
-			if (processEvents)
-			{
-				// Now that we are going to perform an update, let's handle SDL events.
-				// We'll process the system events immediately, and the input events before updating.
-				GatherSDLEvents();
-				ProcessSystemEvents();
-			}
+			// The frame's defined drain point for GPU handles a finalizer could not release itself.
+			// Here rather than anywhere else because it is the one moment in the loop that is
+			// provably not inside command recording: the previous frame's buffer is submitted and
+			// this frame's has not been acquired. See DeferredReleaseQueue.
+			GraphicsDevice.DrainDeferredReleases();
+
+			// Now that we are going to perform an update, let's handle SDL events.
+			// We'll process the system events immediately, and the input events before updating.
+			GatherSDLEvents();
+			ProcessSystemEvents();
 
 			// Quit event came in, bail immediately.
 			if (QuitRequested)
@@ -348,14 +351,10 @@ namespace MoonWorks
 			int updateCount = 0;
 			while (AccumulatedUpdateTime >= FramePacingSettings.Timestep)
 			{
-				// If we are processing events in the accumulator loop
-				// we want to process only input events and not system events.
-				if (processEvents)
-				{
-					GatherSDLEvents();
-					ProcessInputEvents();
-					Inputs.Update();
-				}
+				// In the accumulator loop we process only input events, not system events.
+				GatherSDLEvents();
+				ProcessInputEvents();
+				Inputs.Update();
 
 				// Step once on the timestep interval.
 				if (firstIteration)
@@ -662,22 +661,6 @@ namespace MoonWorks
 
 			PreviousSleepTimes[SleepTimeIndex] = timeSpentSleeping;
 			SleepTimeIndex = (SleepTimeIndex + 1) & SLEEP_TIME_MASK;
-		}
-
-		private unsafe bool OnEventFilter(nint userdata, SDL.SDL_Event* evt)
-		{
-			if (!Initialized)
-			{
-				return true;
-			}
-
-			if ((SDL.SDL_EventType) evt->type == SDL.SDL_EventType.SDL_EVENT_WINDOW_EXPOSED)
-			{
-				Tick(false);
-				return false;
-			}
-
-			return true;
 		}
 
 		private unsafe static int MeasureStringLength(byte* ptr)

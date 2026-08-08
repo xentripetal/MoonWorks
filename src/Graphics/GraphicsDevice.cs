@@ -43,6 +43,13 @@ public class GraphicsDevice : IDisposable
 	/// </summary>
 	public GraphicsStatistics Statistics { get; } = new GraphicsStatistics();
 
+	/// <summary>
+	/// Native handles whose release could not happen inline — today, resources collected by the GC
+	/// without ever being disposed. Drained by <see cref="DrainDeferredReleases"/> on the thread that
+	/// owns this device. See <see cref="DeferredReleaseQueue"/>.
+	/// </summary>
+	public DeferredReleaseQueue DeferredReleases { get; } = new DeferredReleaseQueue();
+
 	private readonly HashSet<GCHandle> resources = new HashSet<GCHandle>();
 	private CommandBufferPool CommandBufferPool;
 	private FencePool FencePool;
@@ -681,6 +688,20 @@ public class GraphicsDevice : IDisposable
 		return result;
 	}
 
+	/// <summary>
+	/// Releases every GPU handle that was deferred since the last drain. Call once per frame from the
+	/// thread that owns this device, at a point where nothing is mid-record.
+	/// </summary>
+	/// <remarks>
+	/// This is the other half of the finalizer's leak detection: the GC thread hands a leaked handle
+	/// to <see cref="DeferredReleases"/> rather than releasing it, and the owning thread does the
+	/// release here, at a defined moment in the frame instead of an arbitrary one. A drain from the
+	/// wrong thread reintroduces exactly the race the queue exists to remove, so the caller is the
+	/// frame loop and nothing else.
+	/// </remarks>
+	/// <returns>How many handles were released.</returns>
+	public int DrainDeferredReleases() => DeferredReleases.Drain();
+
 	internal void AddResourceReference(GCHandle resourceReference)
 	{
 		lock (resources)
@@ -701,30 +722,43 @@ public class GraphicsDevice : IDisposable
 	{
 		if (!IsDisposed)
 		{
-			if (disposing)
+			if (!disposing)
 			{
-				lock (resources)
-				{
-					// Dispose video players first to avoid race condition on threaded decoding
-					foreach (var resource in resources)
-					{
-						if (resource.Target is VideoAV1 player)
-						{
-							player.Dispose();
-						}
-					}
-
-					// Dispose everything else
-					foreach (var resource in resources)
-					{
-						if (resource.Target is IDisposable disposable)
-						{
-							disposable.Dispose();
-						}
-					}
-					resources.Clear();
-				}
+				// Finalizer path: the GC thread owns nothing, and destroying a GPU device from it
+				// races with anything the owning thread is still doing. Say so and leave the device
+				// to the process teardown that is already under way.
+				Logger.LogWarn("GraphicsDevice was not Disposed. The device is left to process teardown.");
+				IsDisposed = true;
+				return;
 			}
+
+			lock (resources)
+			{
+				// Dispose video players first to avoid race condition on threaded decoding
+				foreach (var resource in resources)
+				{
+					if (resource.Target is VideoAV1 player)
+					{
+						player.Dispose();
+					}
+				}
+
+				// Dispose everything else
+				foreach (var resource in resources)
+				{
+					if (resource.Target is IDisposable disposable)
+					{
+						disposable.Dispose();
+					}
+				}
+				resources.Clear();
+			}
+
+			// Anything a finalizer deferred is released here, while the device still exists. After
+			// this the queue is closed: destroying the device frees whatever it still owns, so a
+			// finalizer that runs later must drop its handle rather than release it twice.
+			DeferredReleases.Drain();
+			DeferredReleases.Close();
 
 			SDL.SDL_DestroyGPUDevice(Handle);
 
@@ -737,6 +771,9 @@ public class GraphicsDevice : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Leak detector. The device is never destroyed from here — see <see cref="Dispose(bool)"/>.
+	/// </summary>
 	~GraphicsDevice()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

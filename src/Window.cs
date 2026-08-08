@@ -274,9 +274,14 @@ namespace MoonWorks
 		{
 			if (!IsDisposed)
 			{
-				if (disposing)
+				if (!disposing)
 				{
-					// dispose managed state (managed objects)
+					// Finalizer path. SDL_DestroyWindow is a main-thread-only call and the GC thread
+					// is not it, so the native handle is left alone and the leak is reported
+					// instead. A window is owned by the game loop and disposed there.
+					Logger.LogWarn("A Window was not Disposed. Its native handle is left to process teardown.");
+					IsDisposed = true;
+					return;
 				}
 
 				lock (IDToWindow)
@@ -289,6 +294,9 @@ namespace MoonWorks
 			}
 		}
 
+		/// <summary>
+		/// Leak detector. The native window is never destroyed from here — see <see cref="Dispose(bool)"/>.
+		/// </summary>
 		~Window()
 		{
 			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
