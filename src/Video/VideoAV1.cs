@@ -352,14 +352,32 @@ namespace MoonWorks.Video
 			BufferFrameSync();
 		}
 
+		/// <summary>Closes the dav1d file handle. Deferred off the finalizer thread.</summary>
+		private static readonly Action<IntPtr, IntPtr> CloseFile =
+			static (_, handle) => Dav1dfile.Bindings.df_close(handle);
+
+		/// <summary>Frees the decode scratch buffer. Deferred off the finalizer thread.</summary>
+		private static readonly Action<IntPtr, IntPtr> FreeByteBuffer =
+			static (_, buffer) => NativeMemory.Free((void*) buffer);
+
+		/// <inheritdoc />
+		/// <remarks>
+		/// The dav1d handle and its scratch buffer are native state a decode thread reads, so the
+		/// finalizer path defers them exactly as a GPU handle is deferred — see
+		/// <see cref="GraphicsResource"/>. The framebuffers below hold nothing but their own
+		/// allocations and are disposed either way.
+		/// </remarks>
 		protected override void Dispose(bool disposing)
 		{
 			if (!IsDisposed)
 			{
-				Dav1dfile.Bindings.df_close(Handle);
+				var fileHandle = handle;
 				handle = IntPtr.Zero;
-				NativeMemory.Free((void*) ByteBuffer);
+				var byteBuffer = ByteBuffer;
 				ByteBuffer = IntPtr.Zero;
+
+				Device.DeferredReleases.ReleaseOrDefer(IntPtr.Zero, fileHandle, CloseFile, inline: disposing);
+				Device.DeferredReleases.ReleaseOrDefer(IntPtr.Zero, byteBuffer, FreeByteBuffer, inline: disposing);
 
 				while (QueuedBuffers.TryDequeue(out var queuedBuffer))
 				{

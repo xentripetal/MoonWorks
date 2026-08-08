@@ -128,6 +128,17 @@ namespace MoonWorks.Graphics.Font
 			return true;
 		}
 
+		/// <summary>Destroys the Wellspring font handle. Deferred off the finalizer thread.</summary>
+		private static readonly Action<IntPtr, IntPtr> DestroyFont =
+			static (_, handle) => Wellspring.Wellspring_DestroyFont(handle);
+
+		/// <inheritdoc />
+		/// <remarks>
+		/// The handle is Wellspring's rather than SDL's, but the rule is the same one
+		/// <see cref="GraphicsResource"/> states: a finalizer runs on the GC thread and may not touch
+		/// a native handle, so the destroy goes through <see cref="DeferredReleaseQueue"/> and happens
+		/// on the owning thread at the frame's drain point.
+		/// </remarks>
 		protected override void Dispose(bool disposing)
 		{
 			if (!IsDisposed)
@@ -137,7 +148,7 @@ namespace MoonWorks.Graphics.Font
 					Texture.Dispose();
 				}
 
-				Wellspring.Wellspring_DestroyFont(Handle);
+				Device.DeferredReleases.ReleaseOrDefer(IntPtr.Zero, Handle, DestroyFont, inline: disposing);
 			}
 			base.Dispose(disposing);
 		}

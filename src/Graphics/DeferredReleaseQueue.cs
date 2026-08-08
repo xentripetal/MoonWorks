@@ -41,16 +41,27 @@ public sealed class DeferredReleaseQueue
 	private readonly ConcurrentQueue<Entry> pending = new();
 	private long deferredTotal;
 	private long releasedTotal;
+	private long droppedTotal;
 	private volatile bool closed;
 
 	/// <summary>Handles waiting to be drained.</summary>
 	public int PendingCount => pending.Count;
 
-	/// <summary>Handles that have ever been deferred — a running leak count.</summary>
+	/// <summary>
+	/// Handles that have ever taken the deferred path — the running leak count. Counts a handle
+	/// whether it was queued or dropped, because both mean the same bug happened.
+	/// </summary>
 	public long DeferredTotal => Interlocked.Read(ref deferredTotal);
 
 	/// <summary>Handles that have ever been released by a drain.</summary>
 	public long ReleasedTotal => Interlocked.Read(ref releasedTotal);
+
+	/// <summary>
+	/// Handles dropped without release because the device was already gone. A non-zero value means a
+	/// resource outlived its device; the memory went with the device, so nothing is lost but the tidy
+	/// accounting.
+	/// </summary>
+	public long DroppedTotal => Interlocked.Read(ref droppedTotal);
 
 	/// <summary>
 	/// Releases <paramref name="resourceHandle"/> now if the caller owns the device, or defers it if
@@ -63,7 +74,12 @@ public sealed class DeferredReleaseQueue
 	/// True on the deterministic disposal path — <c>Dispose()</c> called by the owner. False on the
 	/// finalizer path, where the calling thread owns nothing.
 	/// </param>
-	/// <returns>True when the handle was released inline, false when it was deferred.</returns>
+	/// <returns>True when the handle was released inline, false when it was deferred or dropped.</returns>
+	/// <remarks>
+	/// The closed gate comes first, and it gates <em>both</em> paths. Once the device is destroyed it
+	/// has already freed what it owned, so releasing a handle against it is a use-after-free whichever
+	/// thread asks — a stale wrapper disposed late is no safer than a finalizer running late.
+	/// </remarks>
 	public bool ReleaseOrDefer(
 		IntPtr deviceHandle,
 		IntPtr resourceHandle,
@@ -75,22 +91,31 @@ public sealed class DeferredReleaseQueue
 			return true;
 		}
 
+		if (closed)
+		{
+			Drop();
+			return false;
+		}
+
 		if (inline)
 		{
 			release(deviceHandle, resourceHandle);
 			return true;
 		}
 
+		Interlocked.Increment(ref deferredTotal);
+		pending.Enqueue(new Entry(deviceHandle, resourceHandle, release));
+
+		// Close may have run between the gate above and this enqueue, in which case its drain has
+		// already swept past and would strand the entry for a later Drain to release against a dead
+		// device. Re-reading closed after the enqueue closes that window from the other side: closed
+		// is set before Close drains, so either Close's drain saw this entry or this re-read sees
+		// closed — one of the two always holds, and both end in the entry being discarded.
 		if (closed)
 		{
-			// The device is gone, which freed everything it owned. Releasing the handle now would be
-			// a double free against a destroyed device, so the leak is simply dropped.
-			Interlocked.Increment(ref deferredTotal);
-			return false;
+			DiscardPending();
 		}
 
-		pending.Enqueue(new Entry(deviceHandle, resourceHandle, release));
-		Interlocked.Increment(ref deferredTotal);
 		return false;
 	}
 
@@ -101,6 +126,15 @@ public sealed class DeferredReleaseQueue
 	/// <returns>How many handles were released.</returns>
 	public int Drain()
 	{
+		if (closed)
+		{
+			// The device is destroyed. Anything still here belongs to it and was freed with it, so
+			// releasing it now would be a use-after-free — which is exactly what a public
+			// DrainDeferredReleases() call after teardown would otherwise do.
+			DiscardPending();
+			return 0;
+		}
+
 		var count = 0;
 		while (pending.TryDequeue(out var entry))
 		{
@@ -125,9 +159,25 @@ public sealed class DeferredReleaseQueue
 	public void Close()
 	{
 		closed = true;
-		while (pending.TryDequeue(out _)) { }
+		DiscardPending();
 	}
 
 	/// <summary>True once <see cref="Close"/> has run — the device is gone and drains are pointless.</summary>
 	public bool IsClosed => closed;
+
+	/// <summary>Empties the queue without releasing anything, counting what it threw away.</summary>
+	private void DiscardPending()
+	{
+		while (pending.TryDequeue(out _))
+		{
+			Interlocked.Increment(ref droppedTotal);
+		}
+	}
+
+	/// <summary>Counts one handle that took the deferred path and was discarded immediately.</summary>
+	private void Drop()
+	{
+		Interlocked.Increment(ref deferredTotal);
+		Interlocked.Increment(ref droppedTotal);
+	}
 }

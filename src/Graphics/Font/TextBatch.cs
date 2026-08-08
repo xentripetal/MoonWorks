@@ -237,6 +237,20 @@ namespace MoonWorks.Graphics.Font
 			);
 		}
 
+		/// <summary>Frees the UTF-8 scratch buffer. Deferred off the finalizer thread.</summary>
+		private static readonly Action<IntPtr, IntPtr> FreeStringBytes =
+			static (_, bytes) => NativeMemory.Free((void*) bytes);
+
+		/// <summary>Destroys the Wellspring text batch handle. Deferred off the finalizer thread.</summary>
+		private static readonly Action<IntPtr, IntPtr> DestroyTextBatch =
+			static (_, handle) => Wellspring.Wellspring_DestroyTextBatch(handle);
+
+		/// <inheritdoc />
+		/// <remarks>
+		/// Both native frees take the deferred route on the finalizer path, for the reason
+		/// <see cref="GraphicsResource"/> gives: the GC thread owns nothing and must not free anything
+		/// the owning thread could still be using.
+		/// </remarks>
 		protected override void Dispose(bool disposing)
 		{
 			if (!IsDisposed)
@@ -250,8 +264,11 @@ namespace MoonWorks.Graphics.Font
 					ChunkDataTransferBuffer.Dispose();
 				}
 
-				NativeMemory.Free(StringBytes);
-				Wellspring.Wellspring_DestroyTextBatch(Handle);
+				var stringBytes = (IntPtr) StringBytes;
+				StringBytes = null;
+
+				Device.DeferredReleases.ReleaseOrDefer(IntPtr.Zero, stringBytes, FreeStringBytes, inline: disposing);
+				Device.DeferredReleases.ReleaseOrDefer(IntPtr.Zero, Handle, DestroyTextBatch, inline: disposing);
 			}
 			base.Dispose(disposing);
 		}
