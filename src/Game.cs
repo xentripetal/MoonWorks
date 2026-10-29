@@ -40,7 +40,15 @@ namespace MoonWorks
 		readonly Queue<SDL.SDL_Event> SystemEventQueue = [];
 
 		public GraphicsDevice GraphicsDevice { get; }
+
+		/// <summary>
+		/// Null in the browser: its mixer runs on a thread, and the browser runtime has one thread.
+		/// </summary>
 		public AudioDevice AudioDevice { get; }
+
+		/// <summary>
+		/// Null in the browser, for the same reason as <see cref="AudioDevice"/>.
+		/// </summary>
 		public VideoDevice VideoDevice { get; }
 		public Inputs Inputs { get; }
 
@@ -49,6 +57,9 @@ namespace MoonWorks
 		/// </summary>
 		public TitleStorage RootTitleStorage { get; }
 
+		/// <summary>
+		/// Null in the browser, for the same reason as <see cref="AudioDevice"/>.
+		/// </summary>
 		public UserStorage UserStorage { get; }
 
 		/// <summary>
@@ -69,7 +80,8 @@ namespace MoonWorks
 			WindowCreateInfo windowCreateInfo,
 			FramePacingSettings framePacingSettings,
 			ShaderFormat availableShaderFormats,
-			bool debugMode = false
+			bool debugMode = false,
+			Action<uint> configureGraphicsDeviceProperties = null
 		) {
 			AppInfo = appInfo;
 
@@ -96,8 +108,11 @@ namespace MoonWorks
 			Logger.LogInfo("Initializing title storage...");
 			RootTitleStorage = new TitleStorage(System.AppContext.BaseDirectory);
 
-			Logger.LogInfo("Initializing user storage...");
-			UserStorage = new UserStorage(AppInfo);
+			if (!OperatingSystem.IsBrowser())
+			{
+				Logger.LogInfo("Initializing user storage...");
+				UserStorage = new UserStorage(AppInfo);
+			}
 
 			Logger.LogInfo("Initializing input...");
 			Inputs = new Inputs();
@@ -106,7 +121,8 @@ namespace MoonWorks
 			GraphicsDevice = new GraphicsDevice(
 				RootTitleStorage,
 				availableShaderFormats,
-				debugMode
+				debugMode,
+				configureGraphicsDeviceProperties
 			);
 
 			Logger.LogInfo("Initializing main window...");
@@ -120,11 +136,14 @@ namespace MoonWorks
 			Logger.LogInfo("Applying frame pacing settings...");
 			SetFramePacingSettings(framePacingSettings);
 
-			Logger.LogInfo("Initializing audio thread...");
-			AudioDevice = new AudioDevice();
+			if (!OperatingSystem.IsBrowser())
+			{
+				Logger.LogInfo("Initializing audio thread...");
+				AudioDevice = new AudioDevice();
 
-			Logger.LogInfo("Initializing video thread...");
-			VideoDevice = new VideoDevice(GraphicsDevice);
+				Logger.LogInfo("Initializing video thread...");
+				VideoDevice = new VideoDevice(GraphicsDevice);
+			}
 
 			// handle initial system events so we can get initial controller settings, etc
 			GatherSDLEvents();
@@ -153,6 +172,22 @@ namespace MoonWorks
 		/// </summary>
 		public void Run()
 		{
+			Start();
+
+			while (!QuitRequested)
+			{
+				Tick();
+			}
+
+			Shutdown();
+		}
+
+		/// <summary>
+		/// For hosts that own the loop, such as the browser, which must get control back after
+		/// every frame: call once, then <see cref="RunFrame"/> once per host frame.
+		/// </summary>
+		public void Start()
+		{
 			if (MainWindow.StartMinimized)
 			{
 				// Tell SDL not to activate (focus/raise to front) the app when the
@@ -171,12 +206,26 @@ namespace MoonWorks
 				MainWindow.Show();
 				SDL.SDL_RaiseWindow(MainWindow.Handle);
 			}
+		}
 
-			while (!QuitRequested)
+		/// <summary>
+		/// Runs one tick of the loop <see cref="Run"/> would run. Returns false once the game has
+		/// quit and shut down.
+		/// </summary>
+		public bool RunFrame()
+		{
+			Tick();
+			if (!QuitRequested)
 			{
-				Tick();
+				return true;
 			}
 
+			Shutdown();
+			return false;
+		}
+
+		private void Shutdown()
+		{
 			Logger.LogInfo("Starting shutdown sequence...");
 
 			Logger.LogInfo("Cleaning up game...");
@@ -190,19 +239,19 @@ namespace MoonWorks
 			}
 
 			Logger.LogInfo("Closing video thread...");
-			VideoDevice.Dispose();
+			VideoDevice?.Dispose();
 
 			Logger.LogInfo("Disposing graphics device...");
 			GraphicsDevice.Dispose();
 
 			Logger.LogInfo("Closing audio thread...");
-			AudioDevice.Dispose();
+			AudioDevice?.Dispose();
 
 			Logger.LogInfo("Disposing title storage...");
 			RootTitleStorage.Dispose();
 
 			Logger.LogInfo("Disposing user storage...");
-			UserStorage.Dispose();
+			UserStorage?.Dispose();
 
 			Logger.LogInfo("Quitting SDL...");
 			SDL.SDL_Quit();
@@ -295,7 +344,8 @@ namespace MoonWorks
 		{
 			AdvanceElapsedTime();
 
-			if (FramePacingSettings.Mode != FramePacingMode.Uncapped)
+			// The browser paces frames with requestAnimationFrame and cannot sleep the one thread.
+			if (FramePacingSettings.Mode != FramePacingMode.Uncapped && !OperatingSystem.IsBrowser())
 			{
 				// We want to wait until the framerate cap,
 				// but we don't want to oversleep. Requesting repeated 1ms sleeps and
@@ -320,7 +370,11 @@ namespace MoonWorks
 			}
 
 			// Wait for the swapchain before event processing to minimize input latency.
-			GraphicsDevice.WaitForSwapchain(MainWindow);
+			// WebGPU cannot block; the browser's acquire returns no texture instead of waiting.
+			if (!OperatingSystem.IsBrowser())
+			{
+				GraphicsDevice.WaitForSwapchain(MainWindow);
+			}
 
 			// The frame's defined drain point for GPU handles a finalizer could not release itself.
 			// Here rather than anywhere else because it is the one moment in the loop that is
@@ -381,7 +435,7 @@ namespace MoonWorks
 				Logger.LogInfo($"A frame took too long, updated {updateCount} times to catch up, remaining accumulator time {AccumulatedUpdateTime.TotalMilliseconds} ms");
 			}
 
-			AudioDevice.WakeThread();
+			AudioDevice?.WakeThread();
 
 			// Timestep alpha should be 0 if we are in latency-optimized mode.
 			var alpha = FramePacingSettings.Mode == FramePacingMode.LatencyOptimized ?

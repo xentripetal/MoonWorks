@@ -50,6 +50,19 @@
 		<EmbeddedResource Include="src\Graphics\StockShaders\TranslatedSource\text_msdf.frag.msl">
 			<LogicalName>MoonWorks.Graphics.StockShaders.TextMSDF.frag.msl</LogicalName>
 		</EmbeddedResource>
+		<!-- Embedded WGSL shaders (WebGPU), converted from the SPIR-V by Verse's tools/spv2wgsl -->
+		<EmbeddedResource Include="src\Graphics\StockShaders\WGSL\fullscreen.vert.wgsl">
+			<LogicalName>MoonWorks.Graphics.StockShaders.Fullscreen.vert.wgsl</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="src\Graphics\StockShaders\WGSL\video_yuv2rgba.frag.wgsl">
+			<LogicalName>MoonWorks.Graphics.StockShaders.VideoYUV2RGBA.frag.wgsl</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="src\Graphics\StockShaders\WGSL\text_transform.vert.wgsl">
+			<LogicalName>MoonWorks.Graphics.StockShaders.TextTransform.vert.wgsl</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="src\Graphics\StockShaders\WGSL\text_msdf.frag.wgsl">
+			<LogicalName>MoonWorks.Graphics.StockShaders.TextMSDF.frag.wgsl</LogicalName>
+		</EmbeddedResource>
 		<!-- Embedded DXBC shaders -->
 		<EmbeddedResource Include="src\Graphics\StockShaders\Binary\fullscreen.vert.dxbc">
 			<LogicalName>MoonWorks.Graphics.StockShaders.Fullscreen.vert.dxbc</LogicalName>

@@ -178,6 +178,7 @@ public enum ShaderFormat : uint
 	DXIL = 0x08,
 	MSL = 0x10,
 	MetalLib = 0x20,
+	WGSL = 0x40,
 }
 
 public enum VertexElementFormat

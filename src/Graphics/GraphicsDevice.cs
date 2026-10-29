@@ -82,7 +82,8 @@ public class GraphicsDevice : IDisposable
 	internal unsafe GraphicsDevice(
 		TitleStorage rootTitleStorage,
 		ShaderFormat shaderFormats,
-		bool debugMode
+		bool debugMode,
+		Action<uint> configureProperties = null
 	) {
 		if (shaderFormats == 0)
 		{
@@ -118,6 +119,13 @@ public class GraphicsDevice : IDisposable
 		if ((shaderFormats & ShaderFormat.MetalLib) != 0) {
 			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.metallib", true);
 		}
+		if ((shaderFormats & ShaderFormat.WGSL) != 0) {
+			SDL3.SDL.SDL_SetBooleanProperty(properties, "SDL.gpu.device.create.shaders.wgsl", true);
+		}
+
+		// Backend-specific creation properties the platform supplies, such as WebGPU handles
+		// that had to be requested asynchronously before the device could exist.
+		configureProperties?.Invoke(properties);
 
 		// FIXME: we could redesign this API
 		var agilitySDKVersion = Environment.GetEnvironmentVariable("AGILITY_SDK_VERSION");
@@ -676,6 +684,12 @@ public class GraphicsDevice : IDisposable
 			case "direct3d12":
 				shaderFormat = ShaderFormat.DXIL;
 				extension = "dxil";
+				entryPointName = "main";
+				break;
+
+			case "webgpu":
+				shaderFormat = ShaderFormat.WGSL;
+				extension = "wgsl";
 				entryPointName = "main";
 				break;
 
