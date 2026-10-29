@@ -350,7 +350,9 @@ public unsafe class ResourceUploader : GraphicsResource
 		}
 		commandBuffer.EndCopyPass(copyPass);
 
-		if (wait)
+		// The browser cannot block. Skipping the wait is safe: later submissions are ordered after
+		// this one, and Map(true) below cycles to a fresh transfer buffer.
+		if (wait && !OperatingSystem.IsBrowser())
 		{
 			var fence = Device.SubmitAndAcquireFence(commandBuffer);
 			Device.WaitForFence(fence);

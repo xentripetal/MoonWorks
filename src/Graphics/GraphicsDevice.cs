@@ -576,6 +576,14 @@ public class GraphicsDevice : IDisposable
 	/// </summary>
 	public void Wait()
 	{
+		// WebGPU work completes only when control returns to the browser, so an idle wait on the
+		// one thread never ends. Queue order already makes later submissions see earlier ones;
+		// what a wait cannot be skipped for (CPU readback) goes through WaitForFence, which throws.
+		if (OperatingSystem.IsBrowser())
+		{
+			return;
+		}
+
 		if (!SDL.SDL_WaitForGPUIdle(Handle))
 		{
 			Logger.LogError(SDL3.SDL.SDL_GetError());
@@ -599,6 +607,7 @@ public class GraphicsDevice : IDisposable
 	/// </summary>
 	public unsafe void WaitForFence(Fence fence)
 	{
+		ThrowIfCannotWait();
 		SDL.SDL_WaitForGPUFences(
 			Handle,
 			true,
@@ -613,6 +622,7 @@ public class GraphicsDevice : IDisposable
 	/// <param name="waitAll">If true, will wait for all given fences to be signaled.</param>
 	public unsafe void WaitForFences(bool waitAll, params Span<Fence> fences)
 	{
+		ThrowIfCannotWait();
 		Span<IntPtr> handlePtr = stackalloc nint[fences.Length];
 
 		for (var i = 0; i < fences.Length; i += 1)
@@ -626,6 +636,14 @@ public class GraphicsDevice : IDisposable
 			handlePtr,
 			(uint) fences.Length
 		);
+	}
+
+	private static void ThrowIfCannotWait()
+	{
+		if (OperatingSystem.IsBrowser())
+		{
+			throw new PlatformNotSupportedException("The browser cannot block on a fence; poll QueryFence once per frame instead.");
+		}
 	}
 
 	/// <summary>
