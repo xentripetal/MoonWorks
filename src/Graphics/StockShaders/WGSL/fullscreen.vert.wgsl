@@ -1,4 +1,5 @@
 // sdlgpu samplers=0 storage_textures=0 storage_buffers=0 uniform_buffers=0
+diagnostic(off, derivative_uniformity);
 struct gl_PerVertex {
     @builtin(position) gl_Position: vec4<f32>,
     gl_PointSize: f32,

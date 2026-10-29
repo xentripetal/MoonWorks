@@ -1,4 +1,5 @@
 // sdlgpu samplers=4 storage_textures=0 storage_buffers=0 uniform_buffers=0
+diagnostic(off, derivative_uniformity);
 var<private> in_u002e_var_u002e_TEXCOORD0_1: vec2<f32>;
 var<private> in_u002e_var_u002e_TEXCOORD1_1: vec4<f32>;
 var<private> in_u002e_var_u002e_TEXCOORD2_1: f32;

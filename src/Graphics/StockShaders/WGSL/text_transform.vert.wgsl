@@ -1,4 +1,5 @@
 // sdlgpu samplers=0 storage_textures=0 storage_buffers=1 uniform_buffers=1
+diagnostic(off, derivative_uniformity);
 struct ChunkData {
     MatrixTransform: mat4x4<f32>,
     Color: vec4<f32>,
